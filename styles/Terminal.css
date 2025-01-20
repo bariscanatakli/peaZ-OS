@@ -1,0 +1,299 @@
+.terminal {
+    background-color: rgba(30, 30, 30, 0.95);
+    /* Darker background */
+    color: #00ff00;
+    /* Brighter green text */
+    font-family: 'Courier New', monospace;
+    padding: 20px;
+    height: 100%;
+    width: 100%;
+    border-radius: 8px;
+    /* Rounded corners */
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.5);
+    /* Added shadow */
+    transition: all 0.3s ease;
+    /* Add Flexbox properties */
+    display: flex;
+    flex-direction: column;
+}
+
+.terminal-container {
+    /* Remove existing border if any */
+    border: none;
+
+    /* Optionally, adjust border-radius or add a new one */
+    border-radius: 8px;
+    /* Adjust as needed */
+
+    /* Existing styles */
+    transition: box-shadow 0.3s ease, transform 0.3s ease;
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    min-width: 600px;
+    min-height: 400px;
+    resize: both;
+    overflow: auto;
+    z-index: 999;
+    background-color: rgba(30, 30, 30, 0.95);
+    /* Consistent background */
+    /* Removed border */
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.5);
+    /* Added shadow */
+}
+
+.terminal-container.open {
+    opacity: 1;
+    transform: translateY(0);
+}
+
+@keyframes terminalOpenAnimation {
+    0% {
+        transform: translate(-50%, -50%) scale(0.9);
+        opacity: 0;
+    }
+
+    100% {
+        transform: translate(-50%, -50%) scale(1);
+        opacity: 1;
+    }
+}
+
+.terminal-minimized {
+    display: none;
+}
+
+.terminal-header {
+    display: flex;
+    justify-content: space-between;
+    background-color: #333;
+    padding: 5px 10px;
+    cursor: grab;
+}
+
+.terminal-container.maximized {
+    width: 100% !important;
+    height: 100% !important;
+    top: 0 !important;
+    left: 0 !important;
+}
+
+
+
+.terminal-container.open {
+    animation: terminalOpenAnimation 0.5s ease forwards;
+}
+
+@keyframes terminalOpenAnimation {
+    0% {
+        transform: translate(-50%, -50%) scale(0.9);
+        opacity: 0;
+    }
+
+    100% {
+        transform: translate(-50%, -50%) scale(1);
+        opacity: 1;
+    }
+}
+
+.terminal {
+    background-color: rgba(30, 30, 30, 0.95);
+    /* Darker background */
+    color: #00ff00;
+    /* Brighter green text */
+    font-family: 'Courier New', monospace;
+    padding: 20px;
+    height: calc(100% - 30px);
+    width: 100%;
+    border-bottom-left-radius: 8px;
+    border-bottom-right-radius: 8px;
+    box-sizing: border-box;
+    overflow: hidden;
+}
+
+.terminal-input {
+    background: transparent;
+    border: none;
+    color: #0f0;
+    width: 100%;
+    font-family: 'Courier New', monospace;
+    outline: none;
+    margin-top: 10px;
+}
+
+/* Scrollbar styles */
+.terminal-output {
+    /* Allow the output area to expand and be scrollable */
+    flex-grow: 1;
+    overflow-y: auto;
+
+    /* Existing scrollbar styles */
+    scrollbar-width: thin;
+    scrollbar-color: #00ff00 rgba(30, 30, 30, 0.95);
+}
+
+.terminal-output::-webkit-scrollbar {
+    width: 8px;
+}
+
+.terminal-output::-webkit-scrollbar-track {
+    background: rgba(30, 30, 30, 0.95);
+}
+
+.terminal-output::-webkit-scrollbar-thumb {
+    background-color: #00ff00;
+    border-radius: 4px;
+    border: 2px solid rgba(30, 30, 30, 0.95);
+}
+
+.terminal-output::-webkit-scrollbar-thumb:hover {
+    background-color: #33ff33;
+}
+
+
+
+.home-container {
+    background-color: #1e1e1e;
+    color: #00ff00;
+    font-family: 'Courier New', monospace;
+    height: 100vh;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+}
+
+.home-container h1 {
+    font-size: 3rem;
+    margin-bottom: 20px;
+}
+
+.home-container p {
+    font-size: 1.5rem;
+    margin-bottom: 40px;
+}
+
+
+
+@media (max-width: 768px) {
+    .terminal-container {
+        width: 90%;
+        height: 60%;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+        min-width: unset;
+        min-height: unset;
+    }
+
+    .floating-button {
+        bottom: 15px;
+        right: 15px;
+        padding: 12px;
+    }
+
+    .terminal-header {
+        padding: 8px 12px;
+    }
+
+    .terminal-input {
+        font-size: 14px;
+    }
+
+    /* Adjust window controls for better touch accessibility */
+    .control-button {
+        width: 20px;
+        height: 20px;
+    }
+}
+
+@media (max-width: 480px) {
+    .terminal-container {
+        width: 95%;
+        height: 70%;
+    }
+
+    .terminal-header {
+        flex-direction: column;
+        align-items: flex-start;
+    }
+
+    .window-controls {
+        gap: 8px;
+    }
+
+    .control-button {
+        width: 22px;
+        height: 22px;
+    }
+}
+
+.window-controls {
+    display: flex;
+    gap: 10px;
+}
+
+.control-button {
+    width: 16px;
+    height: 16px;
+    border: none;
+    border-radius: 50%;
+    cursor: pointer;
+    font-size: 12px;
+    color: #fff;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 0;
+}
+
+.control-button.minimize {
+    background-color: #ffbd2e;
+    /* Yellow */
+}
+
+.control-button.maximize {
+    background-color: #28c940;
+    /* Green */
+}
+
+.control-button.close {
+    background-color: #ff5f56;
+    /* Red */
+}
+
+.control-button:hover {
+    opacity: 0.8;
+}
+
+
+.input-line {
+    display: flex;
+    align-items: baseline; /* Change from center to baseline */
+    line-height: 1.5; /* Ensure consistent line-height */
+    padding: 0; /* Remove any padding */
+    margin: 0; /* Remove any margin */
+}
+
+.prompt {
+    margin-right: 8px;
+    line-height: 1.5;
+    font-size: 14px; /* Ensure font size matches input */
+    padding: 0;
+}
+.terminal-input {
+    flex: 1;
+    height: 1.5em;
+    line-height: 1.5em;
+    background: transparent;
+    border: none;
+    color: #0f0;
+    font-family: 'Courier New', monospace;
+    font-size: 14px; /* Ensure font size matches prompt */
+    outline: none;
+    padding: 0;
+    margin: 0;
+    vertical-align: baseline; /* Align input vertically with prompt */
+    box-sizing: border-box; /* Ensure padding and border are included in height */
+}

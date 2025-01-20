@@ -1,0 +1,21 @@
+.autocomplete-suggestions {
+    position: absolute;
+    background-color: #2e2e2e;
+    color: #0f0;
+    border: 1px solid #555;
+    border-radius: 4px;
+    max-height: 150px;
+    overflow-y: auto;
+    /* width: calc(100% - 40px); */
+    margin-top: 5px;
+    z-index: 1001;
+}
+
+.autocomplete-suggestions li {
+    padding: 8px 12px;
+    cursor: pointer;
+}
+
+.autocomplete-suggestions li:hover {
+    background-color: #444;
+}

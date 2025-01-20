@@ -1,0 +1,25 @@
+/* Context Menu Styles */
+/* Modify Context Menu Border */
+.context-menu {
+    /* Remove existing border */
+    border: none;
+
+    /* Optionally, add a subtle border or shadow */
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.3);
+    border-radius: 4px; /* Rounded corners */
+
+    /* Existing styles */
+    background-color: #fff;
+    list-style: none;
+    padding: 10px;
+    width: 150px;
+}
+.context-menu li {
+    padding: 8px 12px;
+    cursor: pointer;
+}
+
+.context-menu li:hover {
+    background-color: #f0f0f0;
+}
+
