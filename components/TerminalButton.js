@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 
-const TerminalButton = ({ terminal, onOpen, onClose }) => {
+const TerminalButton = ({ terminal, onOpen, isActive }) => {
   const [showMenu, setShowMenu] = useState(false);
   const [menuPosition, setMenuPosition] = useState({ x: 0, y: 0 });
 
@@ -11,7 +11,7 @@ const TerminalButton = ({ terminal, onOpen, onClose }) => {
   };
 
   const handleClose = () => {
-    onClose(terminal.id);
+    onOpen(terminal.id);
     setShowMenu(false);
   };
 
@@ -25,14 +25,20 @@ const TerminalButton = ({ terminal, onOpen, onClose }) => {
   };
 
   return (
-    <div onContextMenu={handleContextMenu} onClick={handleClick} style={{ position: 'relative', marginRight: '8px' }}>
-      <button className="taskbar-button">
-        <span role="img" aria-label="terminal">💻</span>
+    <div
+      onContextMenu={handleContextMenu}
+      onClick={handleClick}
+      style={{ position: 'relative', marginRight: '8px' }}
+    >
+      <button className={`taskbar-button ${isActive ? 'active' : ''}`}>
+        <span role="img" aria-label="terminal">
+          💻
+        </span>
       </button>
       {showMenu && (
         <ul
           className="context-menu"
-          style={{ top: menuPosition.y - 50, left: menuPosition.x, position: 'absolute', background: '#fff', listStyle: 'none', padding: '10px', boxShadow: '0 2px 5px rgba(0,0,0,0.3)' }}
+          style={{ top: menuPosition.y - 50, left: menuPosition.x, position: 'absolute' }}
           onMouseLeave={() => setShowMenu(false)}
         >
           <li onClick={handleInfo}>Information</li>

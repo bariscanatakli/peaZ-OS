@@ -5,6 +5,7 @@ import '../styles/StartButton.css';
 import '../styles/ContextMenu.css';
 import '../styles/ResizeHandle.css';
 import '../styles/AutocompleteSuggestions.css';
+import '../styles/StartMenu.css';
 
 function MyApp({ Component, pageProps }) {
   return <Component {...pageProps} />;
