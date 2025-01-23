@@ -12,15 +12,27 @@ export const handleInput = (
     fileSystem,
     currentPath,
     setOutput,
-    setSuggestions
+    setSuggestions,
+    role,
+    setRole,
+    isAwaitingPassword,
+    setTerminals,
+    setCurrentPath
 ) => {
     switch (e.key) {
         case 'Enter':
+            if (isAwaitingPassword) {
+                handleCommand(`authenticate ${input}`, setOutput, setHistory, currentPath, fileSystem, setCurrentPath, history, role, setRole, setTerminals, setIsEditing,
+                    setEditingFile,
+                    setFileContent); // Pass setTerminals
+                setInput('');
+                break;
+            }
             if (input.trim()) {
-                handleCommand(input.trim());
+                handleCommand(input.trim(), setOutput, setHistory, currentPath, fileSystem, setCurrentPath, history, role, setRole, setTerminals); // Pass setTerminals
+                setInput('');
                 setHistory([...history, input.trim()]);
                 setHistoryIndex(-1);
-                setInput('');
                 setSuggestions([]);
             }
             break;
@@ -76,7 +88,14 @@ export const handleCommand = (
     currentPath,
     fileSystem,
     setCurrentPath,
-    history
+    history,
+    role,
+    setRole,
+    setTerminals,
+    currentTerminalId,
+    setIsEditing,
+    setEditingFile,
+    setFileContent
 ) => {
     if (!cmd) return;
 
@@ -84,30 +103,77 @@ export const handleCommand = (
     const command = args.shift().toLowerCase();
 
     if (commands[command]) {
-        const result = commands[command](args, fileSystem, currentPath, setCurrentPath, history);
-        if (result !== null) {
-            if (result === 'CLEAR_COMMAND') {
-                setOutput([]);
-            } else if (result === 'EXIT_COMMAND') {
-                setOutput(prev => [...prev, 'Session terminated.']);
-                // Additional logic to close the terminal if required
-            } else {
-                setOutput(prev => [...prev, result, '']);
-            }
+        let result;
+
+        switch (command) {
+            case 'cd':
+                result = commands[command](args, fileSystem, currentPath, setCurrentPath);
+                break;
+            case 'sudo':
+                result = commands[command](args, fileSystem, currentPath, role, setRole, setOutput);
+                break;  
+            case 'logout':
+                result = commands[command](args, fileSystem, currentPath, role, setRole, setOutput);
+                break;
+            case 'edit':
+                result = commands[command](args, fileSystem, currentPath, role, setRole, setOutput, setIsEditing, setEditingFile, setFileContent);
+                break;
+            case 'authenticate':
+                result = commands[command](args, setRole, setOutput);
+                break;
+            case "rm":
+                result = commands[command](args, fileSystem, currentPath, role);
+                break;
+            case "cat":
+                result = commands[command](args, fileSystem, currentPath);
+                break;
+            case "ls":
+                result = commands[command](args, fileSystem, currentPath);
+                break
+            case "mkdir":
+                result = commands[command](args, fileSystem, currentPath);
+                break;
+            case "touch":
+                result = commands[command](args, fileSystem, currentPath, role);
+                break;
+            case "show":
+                result = commands[command](args, fileSystem, currentPath, setTerminals);
+                break;
+            case 'history':
+                result = commands[command](args, fileSystem, currentPath, history);
+                break;
+            case 'exit':
+                result = commands[command](args, setTerminals, currentTerminalId);
+                break;
+            case "clear":
+                result = commands[command]();
+                break;
+
+            default:
+                result = commands[command](args, fileSystem, currentPath);
         }
+
+        if (result === 'CLEAR_COMMAND') {
+            setOutput([]);
+        } else if (result === 'PASSWORD_PROMPT') {
+            // Handle in Terminal component
+        } else if (result) {
+            setOutput(prev => [...prev, `${getPrompt(currentPath, role)} $ ${cmd}`, result]);
+        } else {
+            setOutput(prev => [...prev, `${getPrompt(currentPath, role)} $ ${cmd}`]);
+        }
+
+        setHistory(prev => [...prev, cmd]);
     } else {
         setOutput(prev => [
             ...prev,
-            `${getPrompt(currentPath)} $ ${cmd}`,
-            `command not found: ${command}`,
-            '',
+            `${getPrompt(currentPath, role)} $ ${cmd}`,
+            `command not found: ${command}`
         ]);
     }
-    setHistory(prev => [...prev, cmd]);
 };
 
-export const getPrompt = (currentPath) => {
-    const username = 'guest';
-    const hostname = 'peaZ-OS';
-    return `${username}@${hostname}:${currentPath}$`;
+export const getPrompt = (currentPath, role) => {
+    const username = role === 'admin' ? 'root' : 'guest';
+    return `${username}@peaZ-OS:${currentPath}$`;
 };

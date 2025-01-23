@@ -1,6 +1,10 @@
+import { auth } from '../../../firebase/firebase';
 import { getDirectory, resolvePath } from './helper';
+import { saveFileSystem } from '../../../firebase/utils/fireStoreOperations';
+import { signInWithEmailAndPassword } from 'firebase/auth';
 
 export const commands = {
+    // File System Commands
     ls: (args, fileSystem, currentPath) => {
         const currentDir = getDirectory(fileSystem, currentPath);
         if (!currentDir || currentDir.type !== 'dir') {
@@ -9,187 +13,180 @@ export const commands = {
         const items = Object.keys(currentDir.content);
         return items.length > 0 ? items.join('  ') : '';
     },
+
     cd: (args, fileSystem, currentPath, setCurrentPath) => {
-        if (args.length === 0) {
-            return 'cd: missing operand';
-        }
-        const target = args[0];
-        const newPath = resolvePath(fileSystem, currentPath, target);
-        if (!newPath) {
-            return `cd: no such directory: ${target}`;
-        }
-        const targetDir = getDirectory(fileSystem, newPath);
-        if (targetDir && targetDir.type === 'dir') {
-            setCurrentPath(newPath);
+        if (args.length === 0) return 'cd: missing operand';
+        const targetPath = args[0];
+        const resolvedPath = resolvePath(currentPath, targetPath);
+        const dir = getDirectory(fileSystem, resolvedPath);
+        if (dir && dir.type === 'dir') {
+            setCurrentPath(resolvedPath);
             return null;
-        } else {
-            return `cd: no such directory: ${target}`;
         }
+        return `cd: no such file or directory: ${targetPath}`;
     },
-    mkdir: (args, fileSystem, currentPath) => {
-        if (args.length === 0) {
-            return 'mkdir: missing operand';
-        }
+
+    mkdir: async (args, fileSystem, currentPath, role) => {
+        if (role !== 'admin') return 'mkdir: permission denied';
+        if (args.length === 0) return 'mkdir: missing operand';
         const dirName = args[0];
-        const newPath = currentPath === '~' ? `~/${dirName}` : `${currentPath}/${dirName}`;
         const parentDir = getDirectory(fileSystem, currentPath);
-        if (!parentDir) {
-            return `mkdir: cannot create directory '${dirName}': No such directory`;
-        }
-        if (parentDir.content[dirName]) {
-            return `mkdir: cannot create directory '${dirName}': File exists`;
-        }
+        if (!parentDir) return `mkdir: cannot create directory '${dirName}': No such directory`;
+        if (parentDir.content[dirName]) return `mkdir: cannot create directory '${dirName}': File exists`;
+        
         parentDir.content[dirName] = { type: 'dir', content: {} };
+        await saveFileSystem(fileSystem);
         return null;
     },
-    rm: (args, fileSystem, currentPath) => {
-        if (args.length === 0) {
-            return 'rm: missing operand';
-        }
-        const target = args[0];
-        const parentPath = currentPath;
-        const parentDir = getDirectory(fileSystem, parentPath);
-        if (!parentDir) {
-            return `rm: cannot remove '${target}': No such directory`;
-        }
-        if (!parentDir.content[target]) {
-            return `rm: cannot remove '${target}': No such file or directory`;
-        }
-        delete parentDir.content[target];
-        return null;
-    },
-    touch: (args, fileSystem, currentPath) => {
-        if (args.length === 0) {
-            return 'touch: missing file operand';
-        }
+
+    touch: async (args, fileSystem, currentPath, role) => {
+        if (role !== 'admin') return 'touch: permission denied';
+        if (args.length === 0) return 'touch: missing file operand';
         const fileName = args[0];
         const parentDir = getDirectory(fileSystem, currentPath);
-        if (!parentDir) {
-            return `touch: cannot create file '${fileName}': No such directory`;
-        }
+        if (!parentDir) return `touch: cannot create file '${fileName}': No such directory`;
+        
         if (!parentDir.content[fileName]) {
             parentDir.content[fileName] = { type: 'file', content: '' };
+            await saveFileSystem(fileSystem);
         }
         return null;
     },
-    echo: (args) => {
-        return args.join(' ');
+
+    rm: async (args, fileSystem, currentPath, role) => {
+        console.log(role)
+        if (role !== 'admin') return 'rm: permission denied';
+        if (args.length === 0) return 'rm: missing operand';
+        const target = args[0];
+        const parentDir = getDirectory(fileSystem, currentPath);
+        if (!parentDir) return `rm: cannot remove '${target}': No such directory`;
+        if (!parentDir.content[target]) return `rm: cannot remove '${target}': No such file or directory`;
+        
+        delete parentDir.content[target];
+        await saveFileSystem(fileSystem);
+        return null;
     },
-    pwd: (args, fileSystem, currentPath) => {
-        return currentPath;
-    },
+
+    // File Operations
     cat: (args, fileSystem, currentPath) => {
-        if (args.length === 0) {
-            return 'cat: missing file operand';
-        }
+        if (args.length === 0) return 'cat: missing file operand';
         const fileName = args[0];
         const parentDir = getDirectory(fileSystem, currentPath);
-        if (!parentDir || parentDir.type !== 'dir') {
-            return `cat: ${fileName}: No such directory`;
-        }
+        if (!parentDir || parentDir.type !== 'dir') return `cat: ${fileName}: No such directory`;
+        
         const file = parentDir.content[fileName];
-        if (!file) {
-            return `cat: ${fileName}: No such file`;
-        }
-        if (file.type !== 'file') {
-            return `cat: ${fileName}: Is a directory`;
-        }
+        if (!file) return `cat: ${fileName}: No such file`;
+        if (file.type !== 'file') return `cat: ${fileName}: Is a directory`;
         return file.content || '';
     },
+
+    edit: async (args, fileSystem, currentPath, role, setRole, setOutput, setIsEditing, setEditingFile, setFileContent) => {
+        if (role !== 'admin') return 'edit: permission denied';
+        if (args.length === 0) return 'edit: missing file operand';
+        const fileName = args[0];
+        const resolvedPath = resolvePath(currentPath, fileName);
+        const file = getDirectory(fileSystem, resolvedPath);
+        
+        if (!file) return `edit: cannot find '${fileName}'`;
+        if (file.type !== 'file') return `edit: '${fileName}' is not a file`;
+        
+        setEditingFile(resolvedPath);
+        setFileContent(file.content);
+        setIsEditing(true);
+        return null;
+    },
+
+    // Authentication Commands
+    sudo: async (args, fileSystem, currentPath, role, setRole, setOutput) => {
+        if (args[0] === 'su' && args[1] === '-') {
+            setOutput(prev => [...prev, 'Password:']);
+            return 'PASSWORD_PROMPT';
+        }
+        return `sudo: command not found: ${args[0]}`;
+    },
+
+    logout: (args, fileSystem, currentPath, role, setRole, setOutput) => {
+        if (role !== 'admin') return 'logout: not logged in as admin';
+        setRole('guest');
+        setOutput(prev => [...prev, 'Switched to guest user.']);
+        return null;
+    },
+
+    authenticate: async (args, setRole, setOutput) => {
+        const [email, password] = args;
+        if (!email || !password) return 'Usage: authenticate <email> <password>';
+        
+        try {
+            await signInWithEmailAndPassword(auth, email, password);
+            const tokenResult = await auth.currentUser.getIdTokenResult();
+            setRole(tokenResult.claims.role || 'guest');
+            setOutput(prev => [...prev, `Logged in as ${tokenResult.claims.role || 'guest'}.`]);
+        } catch (error) {
+            console.error('Authentication error:', error);
+            setOutput(prev => [...prev, 'Authentication failed.']);
+        }
+        return null;
+    },
+
+    show: async (args, fileSystem, currentPath, setTerminals) => {
+        if (args.length === 0) return 'show: missing file operand';
+        const fileName = args[0];
+        const parentDir = getDirectory(fileSystem, currentPath);
+        if (!parentDir || parentDir.type !== 'dir') return `show: ${fileName}: No such directory`;
+        
+        const file = parentDir.content[fileName];
+        if (!file) return `show: ${fileName}: No such file`;
+        if (file.type !== 'file') return `show: ${fileName}: Is a directory`;
+        
+        // Create a new terminal with HTML content
+        const newTerminal = {
+            id: Date.now(),
+            zIndex: 1000,
+            isMinimized: false,
+            position: {
+                x: window.innerWidth / 2 + 50,
+                y: window.innerHeight / 2 + 50,
+            },
+            input: '',
+            output: [],
+            content: file.content, // HTML content to render
+        };
+        
+        setTerminals(prev => [...prev, newTerminal]);
+        return `Opening ${fileName} in new window...`;
+    },
+
+    // Utility Commands
+    clear: () => 'CLEAR_COMMAND',
+    
+    pwd: (args, fileSystem, currentPath) => currentPath,
+    
+    echo: (args) => args.join(' '),
+    
     history: (args, fileSystem, currentPath, history) => {
         return history.length > 0 ? history.join('\n') : 'No commands in history';
     },
-    clear: () => {
-        return 'CLEAR_COMMAND';
-    },
-    mv: (args, fileSystem, currentPath) => {
-        if (args.length < 2) {
-            return 'mv: missing file operand';
-        }
-        const [source, destination] = args;
-        const parentDir = getDirectory(fileSystem, currentPath);
-        if (!parentDir) {
-            return `mv: cannot move '${source}': No such directory`;
-        }
-        if (!parentDir.content[source]) {
-            return `mv: cannot move '${source}': No such file or directory`;
-        }
-        if (parentDir.content[destination]) {
-            return `mv: cannot move '${source}': Destination '${destination}' already exists`;
-        }
-        parentDir.content[destination] = parentDir.content[source];
-        delete parentDir.content[source];
-        return null;
-    },
-    cp: (args, fileSystem, currentPath) => {
-        if (args.length < 2) {
-            return 'cp: missing file operand';
-        }
-        const [source, destination] = args;
-        const parentDir = getDirectory(fileSystem, currentPath);
-        if (!parentDir) {
-            return `cp: cannot copy '${source}': No such directory`;
-        }
-        const sourceFile = parentDir.content[source];
-        if (!sourceFile) {
-            return `cp: cannot copy '${source}': No such file or directory`;
-        }
-        if (parentDir.content[destination]) {
-            return `cp: cannot copy '${source}': Destination '${destination}' already exists`;
-        }
-        // Deep copy for directories
-        const copy = JSON.parse(JSON.stringify(sourceFile));
-        parentDir.content[destination] = copy;
-        return null;
-    },
-    grep: (args, fileSystem, currentPath) => {
-        if (args.length < 2) {
-            return 'grep: missing search pattern or file operand';
-        }
-        const [pattern, ...files] = args;
-        let result = '';
-        const parentDir = getDirectory(fileSystem, currentPath);
-        if (!parentDir) {
-            return `grep: No such directory: ${currentPath}`;
-        }
-        files.forEach(fileName => {
-            const file = parentDir.content[fileName];
-            if (!file) {
-                result += `grep: ${fileName}: No such file or directory\n`;
-                return;
-            }
-            if (file.type !== 'file') {
-                result += `grep: ${fileName}: Is a directory\n`;
-                return;
-            }
-            const lines = file.content.split('\n');
-            lines.forEach((line, index) => {
-                if (line.includes(pattern)) {
-                    result += `${fileName}:${index + 1}:${line}\n`;
-                }
-            });
-        });
-        return result || 'No matches found';
-    },
+
     help: () => {
         return `Available commands:
 ls - list directory contents
 cd - change directory
 mkdir - create a new directory
-rm - remove files or directories
 touch - create a new file
-echo - display a line of text
-pwd - print working directory
+rm - remove files or directories
 cat - display file contents
+edit - edit file contents
+sudo su - switch to admin user
+logout - switch back to guest user
+clear - clear terminal screen
+pwd - print working directory
+echo - display a line of text
 history - show command history
-clear - clear the terminal
-mv - move or rename a file/directory
-cp - copy a file/directory
-grep - search text using patterns
-help - show available commands
-exit - close terminal`;
+help - display this help message`;
     },
-    exit: () => {
-        return 'EXIT_COMMAND';
-    },
+
+    exit: (args, setTerminals, currentTerminalId) => {
+        setTerminals(prev => prev.filter(t => t.id !== currentTerminalId));
+        return null;
+    }
 };

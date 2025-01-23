@@ -12,8 +12,8 @@ const StartMenu = forwardRef(({ onAddTerminal, onClose }, ref) => {
             ref={ref}
             style={{
                 position: 'absolute',
-                bottom: '60px', // Adjust based on taskbar height
-                left: '10px',    // Align with Start button
+                bottom: '32px', // Adjust based on taskbar height
+                left: '-8px',    // Align with Start button
                 zIndex: 1001,
             }}
             onMouseLeave={onClose}

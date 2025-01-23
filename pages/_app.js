@@ -6,6 +6,7 @@ import '../styles/ContextMenu.css';
 import '../styles/ResizeHandle.css';
 import '../styles/AutocompleteSuggestions.css';
 import '../styles/StartMenu.css';
+import '../styles/Editor.css';
 
 function MyApp({ Component, pageProps }) {
   return <Component {...pageProps} />;

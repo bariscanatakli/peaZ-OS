@@ -1,38 +1,38 @@
-// ...existing code...
-
 export const getDirectory = (fileSystem, path) => {
-    const parts = path.split('/').filter(part => part && part !== '~');
-    let dir = fileSystem['~'];
+    if (!path || !fileSystem) return null;
+    
+    const parts = path.split('/').filter(Boolean);
+    let current = fileSystem['~'];
+
     for (const part of parts) {
-        const dirName = Object.keys(dir.content).find(
-            name => name.toLowerCase() === part.toLowerCase() && dir.content[name].type === 'dir'
-        );
-        if (!dirName) {
+        if (part === '..') {
+            // Handle parent directory
+            parts.pop();
+            continue;
+        }
+        if (!current || !current.content || !current.content[part]) {
             return null;
         }
-        dir = dir.content[dirName];
+        current = current.content[part];
     }
-    return dir;
+    return current;
 };
 
-export const resolvePath = (fileSystem, currentPath, target) => {
-    if (target === '~') {
-        return '~';
-    } else if (target === '..') {
-        const parts = currentPath.split('/').filter(part => part && part !== '~');
-        parts.pop();
-        return parts.length > 0 ? `~/${parts.join('/')}` : '~';
-    } else {
-        const currentDir = getDirectory(fileSystem, currentPath);
-        if (!currentDir) return null;
-        const dirName = Object.keys(currentDir.content).find(
-            name => name.toLowerCase() === target.toLowerCase() && currentDir.content[name].type === 'dir'
-        );
-        if (dirName) {
-            return currentPath === '~' ? `~/${dirName}` : `${currentPath}/${dirName}`;
+export const resolvePath = (currentPath, targetPath) => {
+    if (targetPath.startsWith('/')) {
+        return targetPath;
+    }
+
+    const current = currentPath.split('/').filter(Boolean);
+    const target = targetPath.split('/').filter(Boolean);
+
+    for (const part of target) {
+        if (part === '..') {
+            current.pop();
+        } else if (part !== '.') {
+            current.push(part);
         }
-        return null;
     }
-};
 
-// ...export and existing code...
+    return '/' + current.join('/');
+};

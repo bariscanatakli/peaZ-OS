@@ -28,15 +28,9 @@ export const handleMouseUp = (e, setIsDragging, setIsResizing, setResizeDirectio
     setIsDragging(false);
     setIsResizing(false);
     setResizeDirection('');
-
 }
 
-export const handleClick = (bringToFront) => {
-    bringToFront();
-};
-
 export const handleClose = (id, onClose) => {
- 
     onClose(id);
 };
 
