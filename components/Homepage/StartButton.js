@@ -1,7 +1,7 @@
 import React, { useState, useRef, useEffect } from 'react';
 import StartMenu from './StartMenu';
 
-const StartButton = ({ onAddTerminal }) => {
+const StartButton = ({ onAddTerminal, setPath }) => {
   const [showMenu, setShowMenu] = useState(false);
   const startButtonRef = useRef(null);
   const menuRef = useRef(null);
@@ -33,19 +33,17 @@ const StartButton = ({ onAddTerminal }) => {
     };
   }, [showMenu]);
 
-  const handleAddTerminal = () => {
-    onAddTerminal();
+  const handleMenuClick = (selectedPath) => {
+    setPath(selectedPath); // Update path first
+    onAddTerminal(selectedPath); // Pass path to handler
     setShowMenu(false);
   };
-
   return (
     <div className="start-button-container">
       <button className="start-button" onClick={handleClick} ref={startButtonRef}>
-        <span role="img" aria-label="start">
-          🖥️
-        </span>
+        <span role="img" aria-label="start">🖥️</span>
       </button>
-      {showMenu && <StartMenu ref={menuRef} onAddTerminal={handleAddTerminal} onClose={() => setShowMenu(false)} />}
+      {showMenu && <StartMenu setPath={setPath} ref={menuRef} onAddTerminal={handleMenuClick} onClose={() => setShowMenu(false)} />}
     </div>
   );
 };

@@ -12,20 +12,9 @@ import Container from './components/Container';
 import Header from './components/Header';
 import TerminalComponent from './components/Terminal';
 
-const Terminal = ({
-    id,
-    onClose,
-    zIndex,
-    bringToFront,
-    toggleMinimize,
-    initialPosition,
-    input: initialInput,
-    output: initialOutput,
-    isMinimized,
-    userRole = 'guest',
-    setTerminals,
-    content,
-}) => {
+const Terminal = ({ id, onClose, zIndex, bringToFront, toggleMinimize, initialPosition, 
+    input: initialInput, output: initialOutput, isMinimized, userRole = 'guest', 
+    setTerminals, content, initialPath = '/' }) => {
     const [output, setOutput] = useState(initialOutput);
     const [input, setInput] = useState(initialInput);
     const [history, setHistory] = useState([]);
@@ -40,7 +29,7 @@ const Terminal = ({
     const terminalRef = useRef(null);
     const inputRef = useRef(null);
     const [suggestions, setSuggestions] = useState([]);
-    const [currentPath, setCurrentPath] = useState('/');
+    const [currentPath, setCurrentPath] = useState(initialPath); // Use initialPath
     const [role, setRole] = useState(userRole);
     const [isAwaitingPassword, setIsAwaitingPassword] = useState(false);
     const [fileSystem, setFileSystem] = useState(null);
@@ -224,7 +213,7 @@ const Terminal = ({
                     id={id}
                     toggleMinimize={toggleMinimize}
                     position={position}
-                    onClose={() => onClose(id, setTerminals)}       
+                    onClose={() => onClose(id, setTerminals)}
                     handleMinimize={() => handleMinimize(id, toggleMinimize)}
                 />
                 <TerminalComponent

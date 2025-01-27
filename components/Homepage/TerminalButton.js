@@ -28,8 +28,8 @@ const TerminalButton = ({ terminal, onOpen, isActive }) => {
     <div
       onContextMenu={handleContextMenu}
       onClick={handleClick}
-      style={{ position: 'relative', marginRight: '8px' }}
-    >
+      style={{ position: 'relative',  }}
+    > 
       <button className={`taskbar-button ${isActive ? 'active' : ''}`}>
         <span role="img" aria-label="terminal">
           💻

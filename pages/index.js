@@ -10,7 +10,20 @@ const Home = () => {
   const [positionOffset, setPositionOffset] = useState(20);
   const [activeTerminalId, setActiveTerminalId] = useState(null);
   const role = 'guest'; // Set role  
-
+  const [path, setPath] = useState('/');
+  const handleAddTerminal = (selectedPath) => {
+    addTerminal(
+      role,
+      setTerminals,
+      terminals,
+      currentZIndex,
+      setCurrentZIndex,
+      positionOffset,
+      setPositionOffset,
+      setActiveTerminalId,
+      selectedPath || path // Use provided path or default  
+    );
+  };
   return (
     <div className="home-container">
       <h1>Welcome to My Portfolio</h1>
@@ -32,12 +45,16 @@ const Home = () => {
           userRole={terminal.role} // Pass role
           content={terminal.content}
           setTerminals={setTerminals}
+          initialPath={terminal.initialPath}
         />
       ))}
 
       {/* Taskbar at the Bottom */}
       <div className="taskbar">
-        <StartButton onAddTerminal={() => addTerminal(role, setTerminals, terminals, currentZIndex, setCurrentZIndex, positionOffset, setPositionOffset, setActiveTerminalId)} />
+        <StartButton
+          setPath={setPath}
+          onAddTerminal={handleAddTerminal} // Use the new handler
+        />
         {terminals.map((terminal) => (
           <TerminalButton
             key={terminal.id}

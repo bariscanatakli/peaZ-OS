@@ -1,7 +1,18 @@
 import React, { forwardRef } from 'react';
 
-const StartMenu = forwardRef(({ onAddTerminal, onClose }, ref) => {
+const StartMenu = forwardRef(({ onAddTerminal, onClose, setPath }, ref) => {
+    console.log(onAddTerminal)
+    const menuItems = [
+        { label: 'New Terminal', path: '/' },
+        { label: 'About', path: '/about' },
+        { label: 'Skills', path: '/skills' },
+        { label: 'Projects', path: '/projects' },
+        { label: 'Contact', path: '/contact' }
+    ];
+
     const handleMenuClick = (path) => {
+        console.log(path)
+        setPath(path)
         onAddTerminal(path);
         onClose();
     };
@@ -12,19 +23,25 @@ const StartMenu = forwardRef(({ onAddTerminal, onClose }, ref) => {
             ref={ref}
             style={{
                 position: 'absolute',
-                bottom: '32px', // Adjust based on taskbar height
-                left: '-8px',    // Align with Start button
+                bottom: '32px',
+                left: '-8px',
                 zIndex: 1001,
             }}
             onMouseLeave={onClose}
         >
-            <li onClick={onAddTerminal}>New Terminal</li>   
-            <li onClick={() => handleMenuClick('about')}>About</li>
-            <li onClick={() => handleMenuClick('skills')}>Skills</li>
-            <li onClick={() => handleMenuClick('projects')}>Projects</li>
-            <li onClick={() => handleMenuClick('contact')}>Contact</li>
+            {menuItems.map((item, index) => (
+                <li
+                    key={index}
+                    onClick={() => handleMenuClick(item.path)}
+                    className="start-menu-item"
+                >
+                    {item.label}
+                </li>
+            ))}
         </ul>
     );
 });
+
+StartMenu.displayName = 'StartMenu';
 
 export default StartMenu;

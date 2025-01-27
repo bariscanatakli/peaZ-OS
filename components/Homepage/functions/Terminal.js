@@ -1,4 +1,6 @@
-export const addTerminal = (role, setTerminals, terminals, currentZIndex, setCurrentZIndex, positionOffset, setPositionOffset, setActiveTerminalId) => { // Accept role parameter
+export const addTerminal = (role, setTerminals, terminals, currentZIndex, setCurrentZIndex,
+    positionOffset, setPositionOffset, setActiveTerminalId, initialPath = '/') => {
+
     const newTerminal = {
         id: Date.now(),
         zIndex: currentZIndex,
@@ -9,14 +11,15 @@ export const addTerminal = (role, setTerminals, terminals, currentZIndex, setCur
         },
         input: '',
         output: ['Welcome to the terminal! Type "help" for available commands'],
-        role: role, // Assign role
+        role: role,
+        initialPath: initialPath // Store initial path
     };
-    setTerminals([...terminals, newTerminal]);
-    setCurrentZIndex(currentZIndex + 1);
-    setPositionOffset(positionOffset + 20);
+
+    setTerminals(prevTerminals => [...prevTerminals, newTerminal]);
+    setCurrentZIndex(prev => prev + 1);
+    setPositionOffset(prev => prev + 20);
     setActiveTerminalId(newTerminal.id);
 };
-
 export const removeTerminal = (id, setTerminals, terminals, activeTerminalId, setActiveTerminalId) => {
     setTerminals(terminals.filter((terminal) => terminal.id !== id));
     if (activeTerminalId === id) {
@@ -51,5 +54,5 @@ export const handleOpenTerminal = (id, setTerminals) => {
             terminal.id === id ? { ...terminal, isMinimized: false } : terminal
         )
     );
-    
+
 };
