@@ -41,6 +41,14 @@
     /* Removed border */
     box-shadow: 0 4px 10px rgba(0, 0, 0, 0.5);
     /* Added shadow */
+    &.dragging {
+        user-select: none;
+        cursor: grabbing;
+    }
+        
+    &.resizing {
+        cursor: nwse-resize;
+    }
 }
 
 .terminal-container.open {
@@ -244,9 +252,12 @@
 
 .control-button.minimize {
     background-color: #ffbd2e;
+    cursor: pointer;
     /* Yellow */
 }
-
+.control-button.minimize:hover {
+    opacity: 0.8;
+}
 .control-button.maximize {
     background-color: #28c940;
     /* Green */

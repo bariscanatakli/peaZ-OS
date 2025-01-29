@@ -7,9 +7,14 @@ import '../styles/ResizeHandle.css';
 import '../styles/AutocompleteSuggestions.css';
 import '../styles/StartMenu.css';
 import '../styles/Editor.css';
+import { Provider } from 'react-redux';
+import store from '../store';
 
 function MyApp({ Component, pageProps }) {
-  return <Component {...pageProps} />;
+  return (
+    <Provider store={store}>
+      <Component {...pageProps} />
+    </Provider>
+  );
 }
-
 export default MyApp;

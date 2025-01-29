@@ -1,65 +1,77 @@
-import React, { useState } from 'react';
+import React from 'react';
+import { useSelector, useDispatch } from 'react-redux';
 import Terminal from '../components/Terminal';
 import TerminalButton from '../components/Homepage/TerminalButton';
 import StartButton from '../components/Homepage/StartButton';
-import { addTerminal, bringTheTerminalFront, handleOpenTerminal, minimizeTerminal, removeTerminal } from '../components/Homepage/functions/Terminal';
+import {
+  addTerminal,
+  removeTerminal,
+  bringToFront,
+  minimizeTerminal,
+  setPath,
+  setActiveTerminalId,
+} from '../store/slices';
 
 const Home = () => {
-  const [terminals, setTerminals] = useState([]);
-  const [currentZIndex, setCurrentZIndex] = useState(1);
-  const [positionOffset, setPositionOffset] = useState(20);
-  const [activeTerminalId, setActiveTerminalId] = useState(null);
-  const role = 'guest'; // Set role  
-  const [path, setPath] = useState('/');
-  const handleAddTerminal = (selectedPath) => {
-    addTerminal(
-      role,
-      setTerminals,
-      terminals,
-      currentZIndex,
-      setCurrentZIndex,
-      positionOffset,
-      setPositionOffset,
-      setActiveTerminalId,
-      selectedPath || path // Use provided path or default  
-    );
+  const dispatch = useDispatch();
+  const {
+    terminals,
+    currentZIndex,
+    positionOffset,
+    activeTerminalId,
+    path,
+  } = useSelector(state => state.terminals);
+
+  const handleAddTerminal = () => {
+    // Generate timestamp ID
+    const id = Date.now();
+    // Generate unique key using timestamp + random string
+    const key = `terminal-${id}-${Math.random().toString(36).substr(2, 9)}`;
+    dispatch(addTerminal({ id, key }));
   };
+
+  
+
   return (
     <div className="home-container">
       <h1>Welcome to My Portfolio</h1>
       <p>Interact with the terminal below to navigate through my projects.</p>
 
-      {/* Render Terminal Windows */}
       {terminals.map((terminal) => (
         <Terminal
-          key={terminal.id}
+          key={terminal.key || terminal.id}
           id={terminal.id}
-          onClose={() => removeTerminal(terminal.id, setTerminals, terminals, activeTerminalId, setActiveTerminalId)}
+          onClose={() => dispatch(removeTerminal(terminal.id))}
           zIndex={terminal.zIndex}
-          bringToFront={() => bringTheTerminalFront(terminal.id, setTerminals, currentZIndex, setCurrentZIndex, setActiveTerminalId)}
-          toggleMinimize={() => minimizeTerminal(terminal.id, setTerminals, activeTerminalId, setActiveTerminalId)}
+          bringToFront={() => dispatch(bringToFront(terminal.id))}
+          toggleMinimize={() => {
+            dispatch(minimizeTerminal(terminal.id));
+            dispatch(setActiveTerminalId(terminal.isMinimized ? terminal.id : null));
+          }}
           initialPosition={terminal.position}
           input={terminal.input}
           output={terminal.output}
           isMinimized={terminal.isMinimized}
-          userRole={terminal.role} // Pass role
+          userRole={terminal.role}
           content={terminal.content}
-          setTerminals={setTerminals}
           initialPath={terminal.initialPath}
         />
       ))}
 
-      {/* Taskbar at the Bottom */}
       <div className="taskbar">
         <StartButton
-          setPath={setPath}
-          onAddTerminal={handleAddTerminal} // Use the new handler
+          setPath={(p) => dispatch(setPath(p))}
+          onAddTerminal={handleAddTerminal}
         />
         {terminals.map((terminal) => (
           <TerminalButton
             key={terminal.id}
             terminal={terminal}
-            onOpen={() => [handleOpenTerminal(terminal.id, setTerminals), bringTheTerminalFront(terminal.id, setTerminals, currentZIndex, setCurrentZIndex, setActiveTerminalId)]}
+            onOpen={() => {
+              dispatch(bringToFront(terminal.id));
+              dispatch(minimizeTerminal(terminal.id));
+              dispatch(setActiveTerminalId(terminal.id));
+            }}
             isActive={activeTerminalId === terminal.id}
           />
         ))}

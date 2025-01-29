@@ -1,7 +1,7 @@
 import React, { useState, useRef, useEffect, useCallback } from 'react';
 import Editor from '../Editor';
 import {
-    handleCommand, handleInput, handleMouseMove, handleMouseUp,
+    handleCommand, handleMouseMove, handleMouseUp,
     getPrompt, handleMaximize, handleMinimize
 } from './functions';
 import { fetchFileSystem, saveFileSystem } from '../../firebase/utils/fireStoreOperations';
@@ -11,14 +11,43 @@ import { getDirectory } from './functions/helper';
 import Container from './components/Container';
 import Header from './components/Header';
 import TerminalComponent from './components/Terminal';
+import { useDispatch, useSelector } from 'react-redux';
+import { handleInput } from './functions';
+import {
+    addOutput,
+    setRole,
+    setUid,
+    setFileSystem,
+    setIsEditing,
+    setEditingFile,
+    setFileContent,
+    setInput,
+    setPath,
+    setSuggestions,
+    setHistoryIndex,
+    updateHistory,
+    clearOutput,
+    setAwaitingPassword,
+    minimizeTerminal, // Add this import
+    setActiveTerminalId
+} from '../../store/slices';
+const Terminal = ({
+    id,
+    onClose,
+    zIndex,
+    bringToFront,
+    toggleMinimize,
+    initialPosition = { x: window.innerWidth / 2, y: window.innerHeight / 2 },
+    isMinimized,
+    userRole = 'guest',
+    content = null,
+    initialPath = '/'
+}) => {
+    const dispatch = useDispatch();
+    const terminalState = useSelector(state => state.terminals.terminals.find(t => t.id === id));
+    const fileSystem = useSelector(state => state.terminals.fileSystem);
+    const globalFileSystem = useSelector(state => state.terminals.fileSystem);
 
-const Terminal = ({ id, onClose, zIndex, bringToFront, toggleMinimize, initialPosition, 
-    input: initialInput, output: initialOutput, isMinimized, userRole = 'guest', 
-    setTerminals, content, initialPath = '/' }) => {
-    const [output, setOutput] = useState(initialOutput);
-    const [input, setInput] = useState(initialInput);
-    const [history, setHistory] = useState([]);
-    const [historyIndex, setHistoryIndex] = useState(-1);
     const [isDragging, setIsDragging] = useState(false);
     const [position, setPosition] = useState(initialPosition);
     const [offset, setOffset] = useState({ x: 0, y: 0 });
@@ -28,84 +57,128 @@ const Terminal = ({ id, onClose, zIndex, bringToFront, toggleMinimize, initialPo
     const [dimensions, setDimensions] = useState({ width: 600, height: 400 });
     const terminalRef = useRef(null);
     const inputRef = useRef(null);
-    const [suggestions, setSuggestions] = useState([]);
-    const [currentPath, setCurrentPath] = useState(initialPath); // Use initialPath
-    const [role, setRole] = useState(userRole);
-    const [isAwaitingPassword, setIsAwaitingPassword] = useState(false);
-    const [fileSystem, setFileSystem] = useState(null);
-    const [uid, setUid] = useState(null);
+    const [currentPath, setCurrentPath] = useState(initialPath);
 
-    const [isEditing, setIsEditing] = useState(false);
-    const [editingFile, setEditingFile] = useState(null);
-    const [fileContent, setFileContent] = useState('');
+    useEffect(() => {
+        if (terminalState) {
+            setCurrentPath(terminalState.path);
+        }
+    }, [terminalState]);
+    const handleMinimize = useCallback(() => {
+        dispatch(minimizeTerminal(id));
+        dispatch(setActiveTerminalId(isMinimized ? id : null));
+    }, [dispatch, id, isMinimized]);
 
     const handleSave = async (newContent) => {
-        console.log('Saving file:', editingFile);
-        if (!fileSystem || !fileSystem['~'].content) {
-            setOutput(prev => [...prev, 'Error: File system is not initialized.']);
-            return;
+        try {
+            // Update file content in Redux
+            dispatch(setFileContent({
+                terminalId: id,
+                content: newContent
+            }));
+
+            // Update file system
+            const updatedFileSystem = JSON.parse(JSON.stringify(fileSystem));
+            const file = getDirectory(updatedFileSystem, terminalState.editingFile);
+            if (file) {
+                file.content = newContent;
+                dispatch(setFileSystem({ fileSystem: updatedFileSystem }));
+                await saveFileSystem(updatedFileSystem);
+            }
+
+            // Reset editing state
+            dispatch(setIsEditing({ terminalId: id, isEditing: false }));
+            dispatch(setEditingFile({ terminalId: id, editingFile: null }));
+            dispatch(setFileContent({ terminalId: id, content: '' }));
+
+            return true;
+        } catch (error) {
+            console.error('Save error:', error);
+            return false;
         }
-        const file = getDirectory(fileSystem, editingFile);
-        if (!file) {
-            setOutput(prev => [...prev, `Error: File '${editingFile}' not found.`]);
-            setIsEditing(false);
-            return;
-        }
-        file.content = newContent;
-        setFileSystem({ ...fileSystem });
-        await saveFileSystem(fileSystem);
-        setOutput(prev => [...prev, `File '${editingFile}' saved.`]);
-        setIsEditing(false);
-        setEditingFile(null);
-        setFileContent('');
     };
 
     const handleCancel = () => {
-        setIsEditing(false);
-        setEditingFile(null);
+        try {
+            // Reset editing state with terminalId
+            dispatch(setIsEditing({ terminalId: id, isEditing: false }));
+            dispatch(setEditingFile({ terminalId: id, editingFile: null }));
+            dispatch(setFileContent({ terminalId: id, content: '' }));
+        } catch (error) {
+            console.error('Cancel error:', error);
+        }
     };
-
     useEffect(() => {
         const initializeFileSystem = async () => {
             try {
                 const fs = await fetchFileSystem();
                 if (fs) {
-                    setFileSystem(fs);
+                    // Update global file system state
+                    dispatch(setFileSystem({
+                        fileSystem: fs
+                    }));
                 } else {
-                    console.error('Error fetching file system.');
-                }
+                    // If no file system exists in Firebase, create initial one
+                    const initialFs = {
+                        '~': {
+                            type: 'dir',
+                            content: {
+                                home: {
+                                    type: 'dir',
+                                    content: {}
+                                },
+                                backend: {
+                                    type: 'dir',
+                                    content: {}
+                                }
+                            }
+                        }
+                    };
 
+                    await saveFileSystem(initialFs);
+                    dispatch(setFileSystem({
+                        fileSystem: initialFs
+                    }));
+                }
             } catch (error) {
                 console.error('Error initializing file system:', error);
             }
         };
+
         initializeFileSystem();
-    }, []);
+    }, [dispatch]);
+
+    useEffect(() => {
+        const syncFileSystem = async () => {
+            if (terminalState?.fileSystem) {
+                await saveFileSystem(terminalState.fileSystem);
+            }
+        };
+
+        syncFileSystem();
+    }, [terminalState?.fileSystem]);
 
     useEffect(() => {
         const unsubscribe = onAuthStateChanged(auth, async (user) => {
             if (user) {
-                setUid(user.uid);
                 try {
-                    await user.getIdToken(true); // Force refresh to get latest claims
+                    await user.getIdToken(true);
                     const token = await user.getIdTokenResult();
-                    console.log('User role:', token.claims.role || 'guest');
-                    setRole(token.claims.role || 'guest');
-                    setOutput(prev => [...prev, `Logged in as ${token.claims.role || 'guest'}.`]);
+                    dispatch(setRole(token.claims.role || 'guest'));
+                    dispatch(setUid(user.uid));
+                    dispatch(addOutput(`Logged in as ${token.claims.role || 'guest'}.`));
                 } catch (error) {
-                    console.error('Error refreshing token:', error);
-                    setRole('guest');
-                    setOutput(prev => [...prev, 'Error refreshing token. Defaulting to guest.']);
+                    dispatch(addOutput('Error refreshing token. Defaulting to guest.'));
                 }
             } else {
-                setUid(null);
-                setRole('guest');
-                setOutput(prev => [...prev, 'No user is signed in. Operating as guest.']);
+                dispatch(setUid(null));
+                dispatch(setRole('guest'));
+                dispatch(addOutput('No user is signed in. Operating as guest.'));
             }
         });
 
         return () => unsubscribe();
-    }, []);
+    }, [dispatch]);
 
     useEffect(() => {
         if (fileSystem) {
@@ -114,85 +187,112 @@ const Terminal = ({ id, onClose, zIndex, bringToFront, toggleMinimize, initialPo
     }, [fileSystem]);
 
     const handleInputChange = useCallback((e) => {
-        setInput(e.target.value);
-    }, []);
+        dispatch(setInput({
+            terminalId: id,
+            input: e.target.value
+        }));
+    }, [dispatch, id]);
 
-    const handleKeyDownEvent = useCallback(
-        (e) => {
-            handleInput(
-                e,
-                async (cmd) => {
-                    if (cmd === 'PASSWORD_PROMPT') {
-                        setIsAwaitingPassword(true);
-                        return;
-                    }
-                    handleCommand(cmd, setOutput, setHistory, currentPath, fileSystem, setCurrentPath, history, role, setRole, setTerminals, id, setIsEditing, setEditingFile, setFileContent);
-                    setIsAwaitingPassword(false);
-                },
-                input,
-                setInput,
-                history,
-                setHistory,
-                historyIndex,
-                setHistoryIndex,
-                fileSystem,
-                currentPath,
-                setOutput,
-                setSuggestions,
-                role,
+    const handleKeyDownEvent = useCallback((e) => {
+        if (!terminalState) return;
+        handleInput(e, dispatch, {
+
+            id,
+            input: terminalState?.input || '',
+            output: terminalState?.output || [],
+            history: terminalState?.history || [],
+            historyIndex: terminalState?.historyIndex || -1,
+            currentPath: terminalState?.path || '/',
+            role: terminalState?.role || 'guest',
+            fileSystem: terminalState?.fileSystem,
+            actions: {
+                setPath,
                 setRole,
-                isAwaitingPassword,
-                setCurrentPath,
-                setTerminals,
+                addOutput,
+                clearOutput,
+                setFileSystem,
+                setInput,
+                setSuggestions,
+                setHistoryIndex,
+                updateHistory,
                 setIsEditing,
-                setEditingFile,
-                setFileContent,
-            );
-        },
-        [input, history, historyIndex, fileSystem, currentPath, role, isAwaitingPassword]
-    );
+            }
+        });
+    }, [dispatch, terminalState, id]);
+
 
     useEffect(() => {
-        const handleMouseMoveEvent = (e) => {
-            handleMouseMove(
-                e,
-                terminalRef,
-                setPosition,
-                offset,
-                isDragging,
-                isResizing,
-                resizeDirection,
-                dimensions,
-                setDimensions
-            );
+        const handleMouseMove = (e) => {
+            if (isDragging) {
+                const newX = e.clientX - offset.x;
+                const newY = e.clientY - offset.y;
+                const terminalWidth = terminalRef.current?.offsetWidth || 0;
+                const terminalHeight = terminalRef.current?.offsetHeight || 0;
+
+                // Screen boundaries
+                const screenDimensions = {
+                    left: terminalWidth,
+                    bottom: window.innerHeight - terminalHeight / 2,
+                    right: window.innerWidth - terminalWidth / 2,
+                    top: window.innerHeight + terminalHeight / 2
+                };
+
+                // Constrain position within screen bounds
+                setPosition({
+                    x: Math.max(screenDimensions.left / 2,
+                        Math.min(screenDimensions.right, newX)),
+                    y: Math.max(200,
+                        Math.min(screenDimensions.bottom, newY))
+                });
+            } else if (isResizing) {
+                const newWidth = resizeDirection.includes('right') ?
+                    e.clientX - position.x : dimensions.width;
+                const newHeight = resizeDirection.includes('bottom') ?
+                    e.clientY - position.y : dimensions.height;
+
+                setDimensions({
+                    width: Math.max(300, newWidth),
+                    height: Math.max(200, newHeight)
+                });
+            }
         };
 
-        const handleMouseUpEvent = (e) => {
-            handleMouseUp(e, setIsDragging, setIsResizing, setResizeDirection);
+        const handleMouseUp = () => {
+            setIsDragging(false);
+            setIsResizing(false);
+            setResizeDirection('');
         };
 
         if (isDragging || isResizing) {
-            window.addEventListener('mousemove', handleMouseMoveEvent);
-            window.addEventListener('mouseup', handleMouseUpEvent);
+            window.addEventListener('mousemove', handleMouseMove);
+            window.addEventListener('mouseup', handleMouseUp);
         }
 
         return () => {
-            window.removeEventListener('mousemove', handleMouseMoveEvent);
-            window.removeEventListener('mouseup', handleMouseUpEvent);
+            window.removeEventListener('mousemove', handleMouseMove);
+            window.removeEventListener('mouseup', handleMouseUp);
         };
-    }, [isDragging, isResizing, offset, resizeDirection, dimensions]);
+    }, [isDragging, isResizing, offset, position.x, position.y, dimensions, resizeDirection]);
 
-    const handleTerminalClick = () => {
-        bringToFront();
-        // Only focus input if we're not showing HTML content
-        if (!content && inputRef.current) {
-            inputRef.current.focus();
+    const handleTerminalClick = useCallback((e) => {
+        // Bring terminal to front
+        dispatch(bringToFront(id));
+
+        // Focus input unless clicking on a control button or dragging
+        if (!e.target.closest('.window-controls') && !isDragging) {
+            inputRef.current?.focus();
         }
-    };
-
+    }, [dispatch, id, isDragging]);
     return (
         <>
-            {isEditing && (<Editor fileName={editingFile.split('/').pop()} fileContent={fileContent} onSave={handleSave} onCancel={handleCancel} />)}
+            {terminalState?.isEditing && (
+                <Editor
+                    fileName={terminalState.editingFile?.split('/').pop()}
+                    fileContent={terminalState.fileContent}
+                    onSave={handleSave}
+                    onCancel={handleCancel}
+                />
+            )}
             <Container
                 terminalRef={terminalRef}
                 isMinimized={isMinimized}
@@ -202,35 +302,32 @@ const Terminal = ({ id, onClose, zIndex, bringToFront, toggleMinimize, initialPo
                 dimensions={dimensions}
                 handleTerminalClick={handleTerminalClick}
             >
-
                 <Header
-                    bringToFront={() => bringToFront()}
+                    id={id}
+                    position={position}
+                    bringToFront={() => dispatch(bringToFront(id))}
                     setIsDragging={setIsDragging}
                     setOffset={setOffset}
-                    handleMaximize={handleMaximize}
-                    setIsMaximized={setIsMaximized}
-                    isMaximized={isMaximized}
-                    id={id}
-                    toggleMinimize={toggleMinimize}
-                    position={position}
-                    onClose={() => onClose(id, setTerminals)}
-                    handleMinimize={() => handleMinimize(id, toggleMinimize)}
+                    handleMaximize={() => setIsMaximized(!isMaximized)}
+                    isMaximized={isMaximized} 
+                    toggleMinimize={handleMinimize} // Pass the handleMinimize function
+                    onClose={() => dispatch(onClose(id))}
                 />
                 <TerminalComponent
                     content={content}
-                    output={output}
-                    input={input}
+                    output={terminalState.output}
+                    getPrompt={getPrompt}
+                    currentPath={currentPath}
+                    role={terminalState.role}
+                    input={terminalState?.input || ''}
                     inputRef={inputRef}
                     handleInputChange={handleInputChange}
                     handleKeyDownEvent={handleKeyDownEvent}
-                    getPrompt={getPrompt}
-                    currentPath={currentPath}
-                    role={role}
+                    isAwaitingPassword={terminalState.isAwaitingPassword}
+                    id={id}
                 />
             </Container>
-
         </>
-
     );
 };
 

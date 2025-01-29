@@ -1,6 +1,9 @@
 import React, { useState } from 'react';
+import { useDispatch } from 'react-redux';
+import { bringToFront } from '../../store/slices';
 
 const TerminalButton = ({ terminal, onOpen, isActive }) => {
+  const dispatch = useDispatch();
   const [showMenu, setShowMenu] = useState(false);
   const [menuPosition, setMenuPosition] = useState({ x: 0, y: 0 });
 
@@ -13,6 +16,7 @@ const TerminalButton = ({ terminal, onOpen, isActive }) => {
   const handleClose = () => {
     onOpen(terminal.id);
     setShowMenu(false);
+    dispatch(bringToFront(terminal.id));
   };
 
   const handleInfo = () => {
@@ -22,13 +26,14 @@ const TerminalButton = ({ terminal, onOpen, isActive }) => {
 
   const handleClick = () => {
     onOpen(terminal.id);
+    dispatch(bringToFront(terminal.id));
   };
 
   return (
     <div
       onContextMenu={handleContextMenu}
       onClick={handleClick}
-      style={{ position: 'relative',  }}
+      style={{ position: 'relative' }}
     > 
       <button className={`taskbar-button ${isActive ? 'active' : ''}`}>
         <span role="img" aria-label="terminal">

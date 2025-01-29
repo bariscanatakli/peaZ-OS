@@ -1,33 +1,48 @@
 import React from 'react'
 import { handleClose } from '../functions';
 
-function Header({ id, position, handleMinimize, handleMaximize, bringToFront, setIsDragging
-    , setOffset, isMaximized, setIsMaximized, toggleMinimize,
-     onClose }) {
-
+function Header({
+    id,
+    position,
+    bringToFront,
+    setIsDragging,
+    setOffset,
+    handleMaximize,
+    isMaximized,
+    toggleMinimize,
+    onClose
+}) {
     return (
         <div
-            className="terminal-header" s
+            className="terminal-header"
             onMouseDown={(e) => {
+                e.preventDefault(); // Prevent text selection
+                if (!position) return;
                 bringToFront();
                 setIsDragging(true);
-                setOffset({ 
+                setOffset({
                     x: e.clientX - position.x,
                     y: e.clientY - position.y
                 });
             }}
-            onDoubleClick={() => handleMaximize(setIsMaximized, isMaximized)}>
+            onDoubleClick={handleMaximize}
+        >
             <span>Terminal {id}</span>
             <div className="window-controls">
-                <button className="control-button minimize" onClick={() => handleMinimize(id, toggleMinimize)}>–</button>
-                <button className="control-button maximize" onClick={() => handleMaximize(setIsMaximized, isMaximized)}>
+                <button
+                    className="control-button minimize"
+                    onClick={(e) => {
+                        e.stopPropagation();
+                        toggleMinimize();
+                    }}
+                >–</button>
+                <button className="control-button maximize" onClick={handleMaximize}>
                     {isMaximized ? '🗗' : '▢'}
                 </button>
-                <button className="control-button close" onClick={() => handleClose(id, onClose)}>×</button>
+                <button className="control-button close" onClick={onClose}>×</button>
             </div>
-
         </div>
-    )
+    );
 }
 
-export default Header
+export default Header;
