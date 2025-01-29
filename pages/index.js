@@ -14,23 +14,7 @@ import {
 
 const Home = () => {
   const dispatch = useDispatch();
-  const {
-    terminals,
-    currentZIndex,
-    positionOffset,
-    activeTerminalId,
-    path,
-  } = useSelector(state => state.terminals);
-
-  const handleAddTerminal = () => {
-    // Generate timestamp ID
-    const id = Date.now();
-    // Generate unique key using timestamp + random string
-    const key = `terminal-${id}-${Math.random().toString(36).substr(2, 9)}`;
-    dispatch(addTerminal({ id, key }));
-  };
-
-  
+  const { terminals, } = useSelector(state => state.terminals);
 
   return (
     <div className="home-container">
@@ -41,7 +25,6 @@ const Home = () => {
         <Terminal
           key={terminal.key || terminal.id}
           id={terminal.id}
-          onClose={() => dispatch(removeTerminal(terminal.id))}
           zIndex={terminal.zIndex}
           bringToFront={() => dispatch(bringToFront(terminal.id))}
           toggleMinimize={() => {
@@ -59,20 +42,11 @@ const Home = () => {
       ))}
 
       <div className="taskbar">
-        <StartButton
-          setPath={(p) => dispatch(setPath(p))}
-          onAddTerminal={handleAddTerminal}
-        />
+        <StartButton />
         {terminals.map((terminal) => (
           <TerminalButton
             key={terminal.id}
             terminal={terminal}
-            onOpen={() => {
-              dispatch(bringToFront(terminal.id));
-              dispatch(minimizeTerminal(terminal.id));
-              dispatch(setActiveTerminalId(terminal.id));
-            }}
-            isActive={activeTerminalId === terminal.id}
           />
         ))}
       </div>

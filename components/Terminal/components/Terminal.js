@@ -16,9 +16,6 @@ function TerminalComponent({
     id 
 }) {
 
-
-    console.log(content)
-    
     return (
         <div className="terminal">
             {content ? (

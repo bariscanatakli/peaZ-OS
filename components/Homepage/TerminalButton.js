@@ -1,12 +1,18 @@
 import React, { useState } from 'react';
-import { useDispatch } from 'react-redux';
-import { bringToFront } from '../../store/slices';
+import { useDispatch, useSelector } from 'react-redux';
+import { bringToFront, minimizeTerminal, setActiveTerminalId } from '../../store/slices';
 
-const TerminalButton = ({ terminal, onOpen, isActive }) => {
+const TerminalButton = ({ terminal }) => {
   const dispatch = useDispatch();
+  const { activeTerminalId, } = useSelector(state => state.terminals);
   const [showMenu, setShowMenu] = useState(false);
   const [menuPosition, setMenuPosition] = useState({ x: 0, y: 0 });
 
+  const onOpen = () => {
+    dispatch(bringToFront(terminal.id));
+    dispatch(minimizeTerminal(terminal.id));
+    dispatch(setActiveTerminalId(terminal.id));
+  }
   const handleContextMenu = (e) => {
     e.preventDefault();
     setMenuPosition({ x: e.clientX, y: e.clientY });
@@ -14,9 +20,8 @@ const TerminalButton = ({ terminal, onOpen, isActive }) => {
   };
 
   const handleClose = () => {
-    onOpen(terminal.id);
+    onOpen();
     setShowMenu(false);
-    dispatch(bringToFront(terminal.id));
   };
 
   const handleInfo = () => {
@@ -25,8 +30,8 @@ const TerminalButton = ({ terminal, onOpen, isActive }) => {
   };
 
   const handleClick = () => {
-    onOpen(terminal.id);
-    dispatch(bringToFront(terminal.id));
+    onOpen();
+
   };
 
   return (
@@ -34,8 +39,8 @@ const TerminalButton = ({ terminal, onOpen, isActive }) => {
       onContextMenu={handleContextMenu}
       onClick={handleClick}
       style={{ position: 'relative' }}
-    > 
-      <button className={`taskbar-button ${isActive ? 'active' : ''}`}>
+    >
+      <button className={`taskbar-button ${activeTerminalId === terminal.id ? 'active' : ''}`}>
         <span role="img" aria-label="terminal">
           💻
         </span>

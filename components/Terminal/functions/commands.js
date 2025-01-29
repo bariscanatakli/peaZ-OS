@@ -20,25 +20,40 @@ import {
     clearOutput,
 } from '../../../store/slices';
 const systemDirs = ['.', '..', '.git', 'node_modules'];
+import { fetchFileSystem } from '../../../firebase/utils/fireStoreOperations';
 
 export const commands = {
     // File System Commands
-    ls: (args, fileSystem, currentPath, dispatch, role, state) => {
+    ls: async (args, fileSystem, currentPath, dispatch, role, state) => {
+        // Validate and restore fileSystem if needed
         if (!fileSystem || !fileSystem['~']) {
-            return 'ls: file system not initialized';
+            try {
+                const fs = await fetchFileSystem();
+                if (fs) {
+                    dispatch(setFileSystem({ fileSystem: fs }));
+                    fileSystem = fs; // Use restored fileSystem
+                } else {
+                    return 'ls: file system not initialized';
+                }
+            } catch (error) {
+                console.error('Error in ls command:', error);
+                return 'ls: error accessing file system';
+            }
         }
 
+        // Get current directory with restored fileSystem
         const currentDir = getDirectory(fileSystem, currentPath);
         if (!currentDir || currentDir.type !== 'dir') {
             return `ls: cannot access '${currentPath}': No such directory`;
         }
 
-        // Filter out system directories unless user is admin
-        const items = Object.keys(currentDir.content).filter(item => {
+        // Filter items based on role
+        const items = Object.keys(currentDir.content || {}).filter(item => {
             if (role === 'admin') return true;
             return !systemDirs.includes(item);
         });
 
+        // Return filtered items
         return items.length > 0 ? items.join('  ') : '';
     },
 
@@ -117,40 +132,40 @@ export const commands = {
         if (role !== 'admin') {
             return 'rm: permission denied';
         }
-    
+
         if (args.length === 0) {
             return 'rm: missing operand';
         }
-    
+
         const fileName = args[0];
         const recursive = args.includes('-r') || args.includes('-R');
         const parentDir = getDirectory(fileSystem, currentPath);
-    
+
         if (!parentDir) {
             return `rm: cannot remove '${fileName}': No such directory`;
         }
-    
+
         // Create deep copy of fileSystem
         const updatedFileSystem = JSON.parse(JSON.stringify(fileSystem));
         const updatedParentDir = getDirectory(updatedFileSystem, currentPath);
-    
+
         if (!updatedParentDir.content[fileName]) {
             return `rm: cannot remove '${fileName}': No such file or directory`;
         }
-    
+
         if (updatedParentDir.content[fileName].type === 'dir' && !recursive) {
             return `rm: cannot remove '${fileName}': Is a directory`;
         }
-    
+
         // Delete file/directory
         delete updatedParentDir.content[fileName];
-    
+
         // Update Redux state using setFileSystem action
         dispatch(setFileSystem({ fileSystem: updatedFileSystem }));
-    
+
         // Save to Firebase
         await saveFileSystem(updatedFileSystem);
-    
+
         return `'${fileName}' removed successfully`;
     },
 

@@ -29,7 +29,9 @@ import {
     clearOutput,
     setAwaitingPassword,
     minimizeTerminal, // Add this import
-    setActiveTerminalId
+    setActiveTerminalId,
+    setTerminalRef,
+    setInputRef,
 } from '../../store/slices';
 const Terminal = ({
     id,
@@ -46,7 +48,6 @@ const Terminal = ({
     const dispatch = useDispatch();
     const terminalState = useSelector(state => state.terminals.terminals.find(t => t.id === id));
     const fileSystem = useSelector(state => state.terminals.fileSystem);
-    const globalFileSystem = useSelector(state => state.terminals.fileSystem);
 
     const [isDragging, setIsDragging] = useState(false);
     const [position, setPosition] = useState(initialPosition);
@@ -55,8 +56,23 @@ const Terminal = ({
     const [isResizing, setIsResizing] = useState(false);
     const [resizeDirection, setResizeDirection] = useState('');
     const [dimensions, setDimensions] = useState({ width: 600, height: 400 });
-    const terminalRef = useRef(null);
-    const inputRef = useRef(null);
+
+    // Create refs but manage them through Redux
+    const terminalRef = useCallback(node => {
+        if (node !== null) {
+            dispatch(setTerminalRef({ terminalId: id, ref: node }));
+        }
+    }, [dispatch, id]);
+
+    const inputRef = useCallback(node => {
+        if (node !== null) {
+            dispatch(setInputRef({ terminalId: id, ref: node }));
+        }
+    }, [dispatch, id]);
+
+    const currentTerminalRef = terminalState?.refs?.terminal;
+    const currentInputRef = terminalState?.refs?.input;
+
     const [currentPath, setCurrentPath] = useState(initialPath);
 
     useEffect(() => {
@@ -69,76 +85,13 @@ const Terminal = ({
         dispatch(setActiveTerminalId(isMinimized ? id : null));
     }, [dispatch, id, isMinimized]);
 
-    const handleSave = async (newContent) => {
-        try {
-            // Update file content in Redux
-            dispatch(setFileContent({
-                terminalId: id,
-                content: newContent
-            }));
 
-            // Update file system
-            const updatedFileSystem = JSON.parse(JSON.stringify(fileSystem));
-            const file = getDirectory(updatedFileSystem, terminalState.editingFile);
-            if (file) {
-                file.content = newContent;
-                dispatch(setFileSystem({ fileSystem: updatedFileSystem }));
-                await saveFileSystem(updatedFileSystem);
-            }
-
-            // Reset editing state
-            dispatch(setIsEditing({ terminalId: id, isEditing: false }));
-            dispatch(setEditingFile({ terminalId: id, editingFile: null }));
-            dispatch(setFileContent({ terminalId: id, content: '' }));
-
-            return true;
-        } catch (error) {
-            console.error('Save error:', error);
-            return false;
-        }
-    };
-
-    const handleCancel = () => {
-        try {
-            // Reset editing state with terminalId
-            dispatch(setIsEditing({ terminalId: id, isEditing: false }));
-            dispatch(setEditingFile({ terminalId: id, editingFile: null }));
-            dispatch(setFileContent({ terminalId: id, content: '' }));
-        } catch (error) {
-            console.error('Cancel error:', error);
-        }
-    };
     useEffect(() => {
         const initializeFileSystem = async () => {
             try {
                 const fs = await fetchFileSystem();
                 if (fs) {
-                    // Update global file system state
-                    dispatch(setFileSystem({
-                        fileSystem: fs
-                    }));
-                } else {
-                    // If no file system exists in Firebase, create initial one
-                    const initialFs = {
-                        '~': {
-                            type: 'dir',
-                            content: {
-                                home: {
-                                    type: 'dir',
-                                    content: {}
-                                },
-                                backend: {
-                                    type: 'dir',
-                                    content: {}
-                                }
-                            }
-                        }
-                    };
-
-                    await saveFileSystem(initialFs);
-                    dispatch(setFileSystem({
-                        fileSystem: initialFs
-                    }));
+                    dispatch(setFileSystem({ fileSystem: fs }));
                 }
             } catch (error) {
                 console.error('Error initializing file system:', error);
@@ -146,7 +99,7 @@ const Terminal = ({
         };
 
         initializeFileSystem();
-    }, [dispatch]);
+    }, []);
 
     useEffect(() => {
         const syncFileSystem = async () => {
@@ -226,8 +179,8 @@ const Terminal = ({
             if (isDragging) {
                 const newX = e.clientX - offset.x;
                 const newY = e.clientY - offset.y;
-                const terminalWidth = terminalRef.current?.offsetWidth || 0;
-                const terminalHeight = terminalRef.current?.offsetHeight || 0;
+                const terminalWidth = terminalState?.refs?.terminal?.offsetWidth || 0;
+                const terminalHeight = terminalState?.refs?.terminal?.offsetHeight || 0;
 
                 // Screen boundaries
                 const screenDimensions = {
@@ -286,12 +239,7 @@ const Terminal = ({
     return (
         <>
             {terminalState?.isEditing && (
-                <Editor
-                    fileName={terminalState.editingFile?.split('/').pop()}
-                    fileContent={terminalState.fileContent}
-                    onSave={handleSave}
-                    onCancel={handleCancel}
-                />
+                <Editor id={id} />
             )}
             <Container
                 terminalRef={terminalRef}
@@ -309,9 +257,9 @@ const Terminal = ({
                     setIsDragging={setIsDragging}
                     setOffset={setOffset}
                     handleMaximize={() => setIsMaximized(!isMaximized)}
-                    isMaximized={isMaximized} 
+                    isMaximized={isMaximized}
                     toggleMinimize={handleMinimize} // Pass the handleMinimize function
-                    onClose={() => dispatch(onClose(id))}
+
                 />
                 <TerminalComponent
                     content={content}

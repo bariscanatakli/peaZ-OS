@@ -29,6 +29,11 @@ const terminalState = {
   input: '',
   output: [],
   permissions: { read: true, write: false, execute: false },
+  refs: {
+    terminal: null,
+    input: null
+  },
+  
 };
 
 const initialState = {
@@ -211,6 +216,27 @@ export const terminalsSlice = createSlice({
         t.id === terminalId ? { ...t, ...updates } : t
       );
     },
+    setTerminalRef: (state, action) => {
+      const { terminalId, ref } = action.payload;
+      const terminal = state.terminals.find(t => t.id === terminalId);
+      if (terminal) {
+        terminal.refs = {
+          ...terminal.refs,
+          terminal: ref
+        };
+      }
+    },
+
+    setInputRef: (state, action) => {
+      const { terminalId, ref } = action.payload;
+      const terminal = state.terminals.find(t => t.id === terminalId);
+      if (terminal) {
+        terminal.refs = {
+          ...terminal.refs,
+          input: ref  
+        };
+      }
+    },
   },
 });
 
@@ -234,6 +260,8 @@ export const {
   setFileContent,
   setIsEditing,
   setActiveTerminalId,
+  setTerminalRef,
+  setInputRef
 } = terminalsSlice.actions;
 
 export default terminalsSlice.reducer;

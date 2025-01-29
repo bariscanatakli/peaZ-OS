@@ -1,5 +1,6 @@
 import React from 'react'
-import { handleClose } from '../functions';
+import { useDispatch } from 'react-redux';
+import { removeTerminal } from '../../../store/slices';
 
 function Header({
     id,
@@ -10,8 +11,13 @@ function Header({
     handleMaximize,
     isMaximized,
     toggleMinimize,
-    onClose
 }) {
+    const dispatch = useDispatch();
+
+
+    const onClose = () => {
+        dispatch(removeTerminal(id))
+    }
     return (
         <div
             className="terminal-header"
