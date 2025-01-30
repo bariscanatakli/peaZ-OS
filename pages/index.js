@@ -1,20 +1,11 @@
 import React from 'react';
-import { useSelector, useDispatch } from 'react-redux';
+import { useSelector } from 'react-redux';
 import Terminal from '../components/Terminal';
 import TerminalButton from '../components/Homepage/TerminalButton';
 import StartButton from '../components/Homepage/StartButton';
-import {
-  addTerminal,
-  removeTerminal,
-  bringToFront,
-  minimizeTerminal,
-  setPath,
-  setActiveTerminalId,
-} from '../store/slices';
 
 const Home = () => {
-  const dispatch = useDispatch();
-  const { terminals, } = useSelector(state => state.terminals);
+  const { terminals } = useSelector(state => state.terminals);
 
   return (
     <div className="home-container">
@@ -25,19 +16,6 @@ const Home = () => {
         <Terminal
           key={terminal.key || terminal.id}
           id={terminal.id}
-          zIndex={terminal.zIndex}
-          bringToFront={() => dispatch(bringToFront(terminal.id))}
-          toggleMinimize={() => {
-            dispatch(minimizeTerminal(terminal.id));
-            dispatch(setActiveTerminalId(terminal.isMinimized ? terminal.id : null));
-          }}
-          initialPosition={terminal.position}
-          input={terminal.input}
-          output={terminal.output}
-          isMinimized={terminal.isMinimized}
-          userRole={terminal.role}
-          content={terminal.content}
-          initialPath={terminal.initialPath}
         />
       ))}
 

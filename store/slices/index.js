@@ -1,16 +1,15 @@
 import { createSlice } from '@reduxjs/toolkit';
 
-const initialFileSystem = {
-  '~': {
-    type: 'dir',
-    content: {
-      home: {
-        type: 'dir',
-        content: {}
-      }
-    }
+// Add this helper function at the top of the file
+const getDefaultPosition = () => {
+  if (typeof window !== 'undefined') {
+    return { x: window.innerWidth / 2, y: window.innerHeight / 2 };
   }
+  return { x: 0, y: 0 };
 };
+
+
+
 const terminalState = {
   id: null,
   path: '/',
@@ -33,7 +32,14 @@ const terminalState = {
     terminal: null,
     input: null
   },
-  
+  isDragging: false,
+  offset: { x: 0, y: 0 },
+  isMinimized: false,
+  isMaximized: false,
+  position: getDefaultPosition(),
+  dimensions: { width: 600, height: 400 },
+  isResizing: false,
+  resizeDirection: "",
 };
 
 const initialState = {
@@ -65,7 +71,7 @@ export const terminalsSlice = createSlice({
         content: content || null,
         history: history || [],
         historyIndex: historyIndex || -1,
-     
+
         isMinimized: isMinimized || false,
 
       };
@@ -233,8 +239,59 @@ export const terminalsSlice = createSlice({
       if (terminal) {
         terminal.refs = {
           ...terminal.refs,
-          input: ref  
+          input: ref
         };
+      }
+    },
+    setDragging: (state, action) => {
+      const { terminalId, isDragging } = action.payload;
+      console.log(isDragging)
+      const terminal = state.terminals.find(t => t.id === terminalId);
+      if (terminal) {
+        terminal.isDragging = isDragging;
+      }
+    },
+    setOffset: (state, action) => {
+      const { terminalId, offset } = action.payload;
+      const terminal = state.terminals.find(t => t.id === terminalId);
+      if (terminal) {
+        terminal.offset = offset;
+      }
+    },
+    setMaximized: (state, action) => {
+      const { terminalId, isMaximized } = action.payload;
+      const terminal = state.terminals.find(t => t.id === terminalId);
+      if (terminal) {
+        terminal.isMaximized = isMaximized;
+      }
+    },
+    setPosition: (state, action) => {
+      const { terminalId, position } = action.payload;
+      const terminal = state.terminals.find(t => t.id === terminalId);
+      if (terminal) {
+        terminal.position = position;
+      }
+    },
+
+    setDimensions: (state, action) => {
+      const { terminalId, dimensions } = action.payload;
+      const terminal = state.terminals.find(t => t.id === terminalId);
+      if (terminal) {
+        terminal.dimensions = dimensions;
+      }
+    },
+    setResizing: (state, action) => {
+      const { terminalId, isResizing } = action.payload;
+      const terminal = state.terminals.find(t => t.id === terminalId);
+      if (terminal) {
+        terminal.isResizing = isResizing
+      }
+    },
+    setResizeDirection: (state, action) => {
+      const { terminalId, direction } = action.payload;
+      const terminal = state.terminals.find(t => t.id === terminalId);
+      if (terminal) {
+        terminal.resizeDirection = direction
       }
     },
   },
@@ -261,7 +318,14 @@ export const {
   setIsEditing,
   setActiveTerminalId,
   setTerminalRef,
-  setInputRef
+  setInputRef,
+  setDragging,
+  setOffset,
+  setMaximized,
+  setPosition,
+  setDimensions,
+  setResizing,
+  setResizeDirection,
 } = terminalsSlice.actions;
 
 export default terminalsSlice.reducer;

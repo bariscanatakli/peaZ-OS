@@ -1,6 +1,8 @@
 import React from 'react'
+import { getPrompt } from '../../functions'
 
-function Output({ output, getPrompt, currentPath, role }) {
+function Output({ output, currentPath, role }) {
+    
     return (
         <div className="terminal-output">
             {output.map((line, i) => (
