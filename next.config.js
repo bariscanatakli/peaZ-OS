@@ -1,10 +1,10 @@
 /** @type {import('next').NextConfig} */
 const nextConfig = {
     reactStrictMode: true,
-    // Add other Next.js config options here
-    assetPrefix: process.env.NODE_ENV === 'production' ? '/peaZ-OS/' : '',
+    output: 'export', // Static export için gerekli
+    assetPrefix: './', // Statik dosyaların relative yüklenmesini sağlar
+    trailingSlash: true, // Sayfa yönlendirme sorunlarını önlemek için
     basePath: process.env.NODE_ENV === 'production' ? '/peaZ-OS' : '',
-    output: 'export',
 };
 
 export default nextConfig;
