@@ -1,0 +1,115 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Project Details - Terminal</title>
+    <style>
+        body {
+            background: #1e1e1e;
+            color: #00ff00;
+            font-family: 'Courier New', monospace;
+            line-height: 1.6;
+            padding: 2rem;
+        }
+
+        .terminal {
+            max-width: 800px;
+            margin: 0 auto;
+            background: rgba(30, 30, 30, 0.95);
+            padding: 2rem;
+            border-radius: 8px;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.5);
+            max-height: 90vh;
+            overflow-y: auto;
+        }
+
+        .prompt:before {
+            content: "guest@portfolio:~$ ";
+            opacity: 0.8;
+        }
+
+        h1 {
+            color: #ffcc00;
+        }
+
+        h2 {
+            color: #ffcc00;
+        }
+
+        p {
+            margin: 1rem 0;
+        }
+
+        a {
+            color: #00ff00;
+            text-decoration: none;
+        }
+
+        a:hover {
+            text-decoration: underline;
+        }
+
+        :root {
+            --scrollbar-bg: rgba(30, 30, 30, 0.95);
+            --scrollbar-thumb: #00ff00;
+            --scrollbar-hover: #33ff33;
+        }
+
+        /* Firefox */
+        * {
+            scrollbar-width: thin;
+            scrollbar-color: var(--scrollbar-thumb) var(--scrollbar-bg);
+        }
+
+        /* WebKit/Chrome/Safari/Edge */
+        *::-webkit-scrollbar {
+            width: 8px;
+        }
+
+        *::-webkit-scrollbar-track {
+            background: var(--scrollbar-bg);
+        }
+
+        *::-webkit-scrollbar-thumb {
+            background-color: var(--scrollbar-thumb);
+            border-radius: 4px;
+            border: 2px solid var(--scrollbar-bg);
+        }
+
+        *::-webkit-scrollbar-thumb:hover {
+            background-color: var(--scrollbar-hover);
+        }
+    </style>
+</head>
+
+<body>
+    <div class="terminal">
+        <div class="prompt">cat ~/projects/ArrhythmiaDetection.txt</div>
+
+        <h1>Arrhythmia Detection Project</h1>
+        <p><strong>Description:</strong> The Arrhythmia Detection Project is a deep learning model trained on ECG signals for early arrhythmia detection. It aims to provide a reliable tool for healthcare professionals to diagnose arrhythmias.</p>
+
+        <h2>Features</h2>
+        <ul>
+            <li>ECG signal analysis</li>
+            <li>Early arrhythmia detection</li>
+            <li>High accuracy</li>
+            <li>Responsive design</li>
+        </ul>
+
+        <h2>Technologies Used</h2>
+        <ul>
+            <li>Python</li>
+            <li>TensorFlow</li>
+            <li>Keras</li>
+            <li>NumPy</li>
+        </ul>
+
+        <h2>GitHub Repository</h2>
+        <p>Check out the project on GitHub: <a href="https://github.com/bariscanatakli/arrhytmia_detection" target="_blank" rel="noopener noreferrer">https://github.com/bariscanatakli/arrhytmia_detection</a></p>
+    </div>
+</body>
+
+</html>
