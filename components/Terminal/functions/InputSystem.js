@@ -23,7 +23,7 @@ export const handleInput = (e, dispatch, state) => {
         input = '',
         history = [],
         historyIndex = -1,
-        currentPath = '/',
+        path = '/',
         fileSystem = null,
         isAwaitingPassword,
         passwordType,
@@ -55,7 +55,7 @@ export const handleInput = (e, dispatch, state) => {
             }
 
             if (input.trim()) {
-                // dispatch(addOutput({ terminalId: state.id, output: `${getPrompt(currentPath, role)}${input}` }));
+                // dispatch(addOutput({ terminalId: state.id, output: `${getPrompt(path, role)}${input}` }));
                 handleCommand(input.trim(), dispatch, state);
                 dispatch(updateHistory({ terminalId: state.id, command: input.trim() }));
                 dispatch(setHistoryIndex({ terminalId: state.id, historyIndex: -1 }));
@@ -100,7 +100,7 @@ export const handleInput = (e, dispatch, state) => {
                     cmd.startsWith(lastToken)
                 );
             } else if (fileSystem) {
-                const currentDir = getDirectory(fileSystem, currentPath);
+                const currentDir = getDirectory(fileSystem, path);
                 if (currentDir && currentDir.type === 'dir') {
                     suggestions = Object.keys(currentDir.content).filter(name =>
                         name.startsWith(lastToken)
@@ -126,43 +126,51 @@ export const handleCommand = async (cmd, dispatch, state) => {
     const args = cmd.split(' ');
     const command = args.shift().toLowerCase();
 
+    // Add command echo
     dispatch(addOutput({
         terminalId: state.id,
-        output: `${getPrompt(state.currentPath, state.role)}${cmd}`
+        output: `${getPrompt(state.path, state.role)}${cmd}`
     }));
 
-    if (commands[command]) {
-        try {
-            const result = await commands[command](
-                args,
-                state.fileSystem,
-                state.currentPath,
-                dispatch,
-                state.role,
-                state
-            );
+    // Debug: log terminalId
+    console.log('Terminal ID:', state.id);
 
-            if (result) {
-                dispatch(addOutput({
-                    terminalId: state.id,
-                    output: result
-                }));
-            }
-        } catch (error) {
+    // Check if command exists
+    if (!commands[command]) {
+        dispatch(addOutput({
+            terminalId: state.id, 
+            output: `command not found: ${command}`
+        }));
+        return;
+    }
+
+    // Execute command with proper error handling
+    try {
+        const result = await commands[command](
+            args,
+            state.fileSystem,
+            state.path,
+            dispatch,
+            state.role,
+            state
+        );
+
+        if (result) {
             dispatch(addOutput({
                 terminalId: state.id,
-                output: `Error executing command: ${error.message}`
+                output: result
             }));
         }
-    } else {
+    } catch (error) {
+        console.error(`Error executing ${command}:`, error);
         dispatch(addOutput({
             terminalId: state.id,
-            output: `command not found: ${command}`
+            output: `Error: ${error.message}`
         }));
     }
 };
 
-export const getPrompt = (currentPath = '/', role = 'guest') => {
+export const getPrompt = (path = '/', role = 'guest') => {
     const username = role === 'admin' ? 'root' : 'guest';
-    return `${username}@peaZ-OS:${currentPath}${currentPath === '/' ? '' : '/'} `;
+    return `${username}@peaZ-OS:${path}${path === '/' ? '' : '/'} `;
 };

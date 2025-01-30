@@ -25,11 +25,14 @@ function Input({ id }) {
             dispatch(setInputRef({ terminalId: id, ref: node }));
         }
     }, [dispatch, id]);
+    
 
     const handleKeyDownEvent = useCallback((e) => {
         if (!terminalState) return;
         handleInput(e, dispatch, terminalState);
     }, [dispatch, terminalState, id]);
+
+
 
     return (
         <div className="input-line">

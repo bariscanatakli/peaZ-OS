@@ -5,7 +5,7 @@ import { useSelector } from 'react-redux';
 
 function TerminalComponent({ id }) {
     const terminalState = useSelector(state => state.terminals.terminals.find(t => t.id === id));
-    const { content, output, role, currentPath } = terminalState;
+    const { content, output, role, path } = terminalState;
 
     return (
         <div className="terminal">
@@ -23,10 +23,10 @@ function TerminalComponent({ id }) {
 
             {!content && (
                 <>
-                    <Output id={id} output={output} currentPath={currentPath} role={role} />
+                    <Output id={id} output={output} path={path} role={role} />
                     <Input id={id} />
                 </>
-            )}
+            )   }
 
         </div>
     );

@@ -1,6 +1,5 @@
 import React, { useEffect } from 'react';
 import Editor from '../Editor';
-
 import { fetchFileSystem, saveFileSystem } from '../../firebase/utils/fireStoreOperations';
 import { onAuthStateChanged } from 'firebase/auth';
 import { auth } from '../../firebase/firebase';
@@ -13,17 +12,14 @@ import {
     setRole,
     setUid,
     setFileSystem,
-
     setPath,
-
-
 } from '../../store/slices';
 const Terminal = ({
     id,
 }) => {
     const dispatch = useDispatch();
     const terminalState = useSelector(state => state.terminals.terminals.find(t => t.id === id));
-    const fileSystem = useSelector(state => state.terminals.fileSystem);
+    const { isEditing, fileSystem, path } = terminalState;
 
 
 
@@ -31,36 +27,51 @@ const Terminal = ({
 
     useEffect(() => {
         if (terminalState) {
-            setPath({ terminalId: id, path: terminalState.path || '/' });
+            setPath({ terminalId: id, path: path || '/' });
         }
     }, [terminalState]);
 
 
 
     useEffect(() => {
-        const initializeFileSystem = async () => {
+        const initFS = async () => {
             try {
                 const fs = await fetchFileSystem();
-                if (fs) {
+                if (!fs) {
+                    const defaultFS = {
+                        '~': {
+                            type: 'dir',
+                            content: {
+                                'welcome.txt': {
+                                    type: 'file',
+                                    content: 'Welcome to the terminal!'
+                                }
+                            }
+                        }
+                    };
+                    dispatch(setFileSystem({ fileSystem: defaultFS }));
+                    await saveFileSystem(defaultFS);
+                } else {
                     dispatch(setFileSystem({ fileSystem: fs }));
                 }
+                dispatch(setPath({ terminalId: id, path: '/' }));
             } catch (error) {
-                console.error('Error initializing file system:', error);
+                console.error('Error initializing filesystem:', error);
             }
         };
-
-        initializeFileSystem();
+    
+        initFS();
     }, []);
 
     useEffect(() => {
         const syncFileSystem = async () => {
-            if (terminalState?.fileSystem) {
-                await saveFileSystem(terminalState.fileSystem);
+            if (fileSystem) {
+                await saveFileSystem(fileSystem);
             }
         };
 
         syncFileSystem();
-    }, [terminalState?.fileSystem]);
+    }, [fileSystem]);
 
     useEffect(() => {
         const unsubscribe = onAuthStateChanged(auth, async (user) => {
@@ -96,7 +107,7 @@ const Terminal = ({
 
     return (
         <>
-            {terminalState?.isEditing && (<Editor id={id} />)}
+            {isEditing && (<Editor id={id} />)}
             <Container id={id}>
                 <Header id={id} />
                 <TerminalComponent id={id} />

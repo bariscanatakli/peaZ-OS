@@ -12,6 +12,7 @@ const Home = () => {
       <h1>Welcome to My Portfolio</h1>
       <p>Interact with the terminal below to navigate through my projects.</p>
 
+
       {terminals.map((terminal) => (
         <Terminal
           key={terminal.key || terminal.id}

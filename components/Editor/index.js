@@ -35,10 +35,10 @@ const Editor = ({ id }) => {
             }
     
             const updatedFileSystem = JSON.parse(JSON.stringify(fileSystem));
-            const currentPath = editingFile.substring(0, editingFile.lastIndexOf('/'));
+            const path = editingFile.substring(0, editingFile.lastIndexOf('/'));
             const fileName = editingFile.split('/').pop();
             
-            const parentDir = getDirectory(updatedFileSystem, currentPath);
+            const parentDir = getDirectory(updatedFileSystem, path);
             if (!parentDir || !parentDir.content[fileName]) {
                 throw new Error(`File ${editingFile} not found`);
             }
