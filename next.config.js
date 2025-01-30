@@ -1,10 +1,9 @@
 /** @type {import('next').NextConfig} */
 const nextConfig = {
-    reactStrictMode: true,
     output: 'export', // Static export için gerekli
-    assetPrefix: './', // Statik dosyaların relative yüklenmesini sağlar
-    trailingSlash: true, // Sayfa yönlendirme sorunlarını önlemek için
-    basePath: process.env.NODE_ENV === 'production' ? '/peaZ-OS' : '',
+    basePath: '/peaZ-OS', // GitHub Pages repo adıyla aynı olmalı!
+    assetPrefix: '/peaZ-OS/', // Statik dosyaların doğru yüklenmesi için
+    trailingSlash: true, // Sayfa yollarında sonuna "/" ekler
 };
 
 export default nextConfig;
