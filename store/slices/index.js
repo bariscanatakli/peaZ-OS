@@ -280,6 +280,13 @@ export const terminalsSlice = createSlice({
         terminal.dimensions = dimensions;
       }
     },
+    setUid: (state, action) => {
+      const { terminalId, uid } = action.payload;
+      const terminal = state.terminals.find(t => t.id === terminalId);
+      if (terminal) {
+        terminal.uid = uid;
+      }
+    },
     setResizing: (state, action) => {
       const { terminalId, isResizing } = action.payload;
       const terminal = state.terminals.find(t => t.id === terminalId);
@@ -326,6 +333,7 @@ export const {
   setDimensions,
   setResizing,
   setResizeDirection,
+  setUid,
 } = terminalsSlice.actions;
 
 export default terminalsSlice.reducer;
