@@ -1,115 +1,233 @@
 <!DOCTYPE html>
 <html lang="en">
-
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Project Details - Terminal</title>
+    <title>Arrhythmia Detection - Terminal</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     <style>
         body {
             background: #1e1e1e;
             color: #00ff00;
-            font-family: 'Courier New', monospace;
-            line-height: 1.6;
-            padding: 2rem;
+            font-family: 'Cascadia Code', 'Courier New', monospace;
+            margin: 0;
+            padding: 1rem;
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .matrix-bg {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: -1;
+            opacity: 0.1;
         }
 
         .terminal {
+            width: 100%;
             max-width: 800px;
-            margin: 0 auto;
             background: rgba(30, 30, 30, 0.95);
             padding: 2rem;
             border-radius: 8px;
-            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.5);
-            max-height: 90vh;
-            overflow-y: auto;
+            box-shadow: 0 0 20px rgba(0, 255, 0, 0.1);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .terminal-header {
+            border-bottom: 1px solid #00ff00;
+            padding-bottom: 1rem;
+            margin-bottom: 2rem;
+            font-size: 0.8rem;
+            opacity: 0.7;
+        }
+
+        .prompt {
+            margin-bottom: 1.5rem;
+            opacity: 0.8;
+            animation: typing 2s steps(40, end);
+            white-space: nowrap;
+            overflow: hidden;
+            border-right: 2px solid #00ff00;
         }
 
         .prompt:before {
             content: "guest@portfolio:~$ ";
-            opacity: 0.8;
-        }
-
-        h1 {
             color: #ffcc00;
         }
 
-        h2 {
+        h1, h2 {
             color: #ffcc00;
+            text-shadow: 0 0 10px rgba(255, 204, 0, 0.3);
+            margin: 1.5rem 0;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
         }
 
         p {
+            line-height: 1.8;
             margin: 1rem 0;
         }
 
-        a {
-            color: #00ff00;
-            text-decoration: none;
+        ul {
+            list-style: none;
+            padding-left: 0;
         }
 
-        a:hover {
-            text-decoration: underline;
+        li {
+            margin: 0.8rem 0;
+            padding: 0.5rem;
+            transition: all 0.3s ease;
+            border-left: 2px solid transparent;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
         }
 
-        :root {
-            --scrollbar-bg: rgba(30, 30, 30, 0.95);
-            --scrollbar-thumb: #00ff00;
-            --scrollbar-hover: #33ff33;
+        li:hover {
+            border-left: 2px solid #00ff00;
+            padding-left: 1rem;
+            background: rgba(0, 255, 0, 0.05);
+            transform: translateX(5px);
         }
 
-        /* Firefox */
-        * {
-            scrollbar-width: thin;
-            scrollbar-color: var(--scrollbar-thumb) var(--scrollbar-bg);
-        }
-
-        /* WebKit/Chrome/Safari/Edge */
-        *::-webkit-scrollbar {
-            width: 8px;
-        }
-
-        *::-webkit-scrollbar-track {
-            background: var(--scrollbar-bg);
-        }
-
-        *::-webkit-scrollbar-thumb {
-            background-color: var(--scrollbar-thumb);
+        .project-preview {
+            margin: 2rem 0;
+            border: 1px solid #00ff00;
             border-radius: 4px;
-            border: 2px solid var(--scrollbar-bg);
+            overflow: hidden;
+            transition: transform 0.3s ease;
+            box-shadow: 0 0 15px rgba(0, 255, 0, 0.1);
         }
 
-        *::-webkit-scrollbar-thumb:hover {
-            background-color: var(--scrollbar-hover);
+        .project-preview:hover {
+            transform: scale(1.02);
+        }
+
+        .github-link {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            padding: 0.5rem 1rem;
+            border: 1px solid #00ff00;
+            border-radius: 4px;
+            transition: all 0.3s ease;
+            text-decoration: none;
+            color: #00ff00;
+        }
+
+        .github-link:hover {
+            background: rgba(0, 255, 0, 0.1);
+            transform: translateY(-2px);
+            box-shadow: 0 0 15px rgba(0, 255, 0, 0.2);
+        }
+
+        @keyframes typing {
+            from { width: 0 }
+            to { width: 100% }
+        }
+
+        @keyframes blink {
+            50% { border-color: transparent }
         }
     </style>
 </head>
-
 <body>
+    <canvas class="matrix-bg" id="matrix"></canvas>
     <div class="terminal">
+        <div class="terminal-header">
+            <div>System: Windows_NT x64 10.0.19044</div>
+            <div>Shell: PowerShell v7.3.4</div>
+            <div>Time: <span id="current-time"></span></div>
+        </div>
+
         <div class="prompt">cat ~/projects/ArrhythmiaDetection.txt</div>
 
-        <h1>Arrhythmia Detection Project</h1>
-        <p><strong>Description:</strong> The Arrhythmia Detection Project is a deep learning model trained on ECG signals for early arrhythmia detection. It aims to provide a reliable tool for healthcare professionals to diagnose arrhythmias.</p>
+        <h1><i class="fas fa-heartbeat"></i> Arrhythmia Detection</h1>
+        <p><strong>Description:</strong> An AI-powered system for early detection of cardiac arrhythmias using deep learning techniques.</p>
 
-        <h2>Features</h2>
+        <div class="project-preview">
+            <img src="assets/arrhythmia-preview.png" alt="Arrhythmia Detection Interface" style="width: 100%; height: auto;">
+        </div>
+
+        <h2><i class="fas fa-star"></i> Features</h2>
         <ul>
-            <li>ECG signal analysis</li>
-            <li>Early arrhythmia detection</li>
-            <li>High accuracy</li>
-            <li>Responsive design</li>
+            <li><i class="fas fa-chart-line"></i> Real-time ECG analysis</li>
+            <li><i class="fas fa-brain"></i> Deep learning model for arrhythmia detection</li>
+            <li><i class="fas fa-check-circle"></i> High accuracy prediction</li>
+            <li><i class="fas fa-chart-bar"></i> Data visualization</li>
         </ul>
 
-        <h2>Technologies Used</h2>
+        <h2><i class="fas fa-code"></i> Technologies Used</h2>
         <ul>
-            <li>Python</li>
-            <li>TensorFlow</li>
-            <li>Keras</li>
-            <li>NumPy</li>
+            <li><i class="fab fa-python"></i> Python</li>
+            <li><i class="fas fa-brain"></i> TensorFlow</li>
+            <li><i class="fas fa-layer-group"></i> Keras</li>
+            <li><i class="fas fa-calculator"></i> NumPy</li>
         </ul>
 
-        <h2>GitHub Repository</h2>
-        <p>Check out the project on GitHub: <a href="https://github.com/bariscanatakli/arrhytmia_detection" target="_blank" rel="noopener noreferrer">https://github.com/bariscanatakli/arrhytmia_detection</a></p>
+        <h2><i class="fab fa-github"></i> GitHub Repository</h2>
+        <p>
+            <a href="https://github.com/bariscanatakli/arrhytmia_detection" 
+               target="_blank" 
+               rel="noopener noreferrer"
+               class="github-link">
+                <i class="fab fa-github"></i>
+                View Source Code
+                <i class="fas fa-external-link-alt"></i>
+            </a>
+        </p>
     </div>
-</body>
 
+    <script>
+        // Matrix background animation
+        const canvas = document.getElementById('matrix');
+        const ctx = canvas.getContext('2d');
+        canvas.width = window.innerWidth;
+        canvas.height = window.innerHeight;
+        const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789@#$%^&*()';
+        const fontSize = 10;
+        const columns = canvas.width/fontSize;
+        const drops = new Array(Math.floor(columns)).fill(1);
+
+        function draw() {
+            ctx.fillStyle = 'rgba(0, 0, 0, 0.05)';
+            ctx.fillRect(0, 0, canvas.width, canvas.height);
+            ctx.fillStyle = '#0F0';
+            ctx.font = fontSize + 'px monospace';
+            
+            for(let i = 0; i < drops.length; i++) {
+                const text = chars[Math.floor(Math.random() * chars.length)];
+                ctx.fillText(text, i * fontSize, drops[i] * fontSize);
+                if(drops[i] * fontSize > canvas.height && Math.random() > 0.975)
+                    drops[i] = 0;
+                drops[i]++;
+            }
+        }
+
+        setInterval(draw, 33);
+
+        // Update current time
+        function updateTime() {
+            const now = new Date();
+            document.getElementById('current-time').textContent = 
+                now.toLocaleTimeString('en-US', { hour12: false });
+        }
+        
+        updateTime();
+        setInterval(updateTime, 1000);
+
+        // Handle window resize
+        window.addEventListener('resize', () => {
+            canvas.width = window.innerWidth;
+            canvas.height = window.innerHeight;
+        });
+    </script>
+</body>
 </html>

@@ -1,7 +1,6 @@
 import React from 'react';
 import Input from './Terminal/Input';
 import Output from './Terminal/Output';
-import ContentViewer from './ContentViewer';
 import { useSelector } from 'react-redux';
 
 function TerminalComponent({ id }) {
@@ -11,19 +10,20 @@ function TerminalComponent({ id }) {
   const { content, contentType, output, role, path } = terminalState;
 
   return (
-    <div className="terminal">
-      {content && (
-                <div
-                    className="html-viewer"
-                    dangerouslySetInnerHTML={{ __html: content }}
-                    style={{
-                        width: '100%',
-                        height: '100%',
-
-                    }}
-                />
+    <>
+    
+     <div className="terminal">
+     
+     {content && (
+                
+                
+                <iframe srcDoc={content} title="HTML Viewer" style={{
+                    width: '100%',
+                    height: '100%',
+                    border: 'none',
+                    // backgroundColor: 'white',
+                }}/>
             )}
-
             {!content && (
                 <>
                     <Output id={id} output={output} path={path} role={role} />
@@ -32,6 +32,8 @@ function TerminalComponent({ id }) {
             )   }
 
     </div>
+    </>
+   
   );
 }
 

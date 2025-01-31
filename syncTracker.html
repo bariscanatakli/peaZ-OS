@@ -1,114 +1,195 @@
 <!DOCTYPE html>
 <html lang="en">
-
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Project Details - Terminal</title>
+    <title>SyncTracker - Terminal</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     <style>
         body {
             background: #1e1e1e;
             color: #00ff00;
-            font-family: 'Courier New', monospace;
-            line-height: 1.6;
-            padding: 2rem;
+            font-family: 'Cascadia Code', 'Courier New', monospace;
+            margin: 0;
+            padding: 1rem;
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .matrix-bg {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: -1;
+            opacity: 0.1;
         }
 
         .terminal {
+            width: 100%;
             max-width: 800px;
-            margin: 0 auto;
             background: rgba(30, 30, 30, 0.95);
             padding: 2rem;
             border-radius: 8px;
-            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.5);
-            max-height: 90vh;
-            overflow-y: auto;
+            box-shadow: 0 0 20px rgba(0, 255, 0, 0.1);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .prompt {
+            margin-bottom: 1.5rem;
+            opacity: 0.8;
+            animation: typing 2s steps(40, end);
+            white-space: nowrap;
+            overflow: hidden;
         }
 
         .prompt:before {
             content: "guest@portfolio:~$ ";
-            opacity: 0.8;
-        }
-
-        h1 {
             color: #ffcc00;
         }
 
-        h2 {
+        h1, h2 {
             color: #ffcc00;
+            text-shadow: 0 0 10px rgba(255, 204, 0, 0.3);
+            margin: 1.5rem 0;
         }
 
         p {
+            line-height: 1.8;
             margin: 1rem 0;
         }
 
-        a {
-            color: #00ff00;
-            text-decoration: none;
+        ul {
+            list-style: none;
+            padding-left: 0;
         }
 
-        a:hover {
-            text-decoration: underline;
+        li {
+            margin: 0.8rem 0;
+            padding: 0.5rem;
+            transition: all 0.3s ease;
+            border-left: 2px solid transparent;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
         }
 
-        :root {
-            --scrollbar-bg: rgba(30, 30, 30, 0.95);
-            --scrollbar-thumb: #00ff00;
-            --scrollbar-hover: #33ff33;
+        li:hover {
+            border-left: 2px solid #00ff00;
+            padding-left: 1rem;
+            background: rgba(0, 255, 0, 0.05);
         }
 
-        /* Firefox */
-        * {
-            scrollbar-width: thin;
-            scrollbar-color: var(--scrollbar-thumb) var(--scrollbar-bg);
-        }
-
-        /* WebKit/Chrome/Safari/Edge */
-        *::-webkit-scrollbar {
-            width: 8px;
-        }
-
-        *::-webkit-scrollbar-track {
-            background: var(--scrollbar-bg);
-        }
-
-        *::-webkit-scrollbar-thumb {
-            background-color: var(--scrollbar-thumb);
+        .project-preview {
+            margin: 2rem 0;
+            border: 1px solid #00ff00;
             border-radius: 4px;
-            border: 2px solid var(--scrollbar-bg);
+            overflow: hidden;
+            transition: transform 0.3s ease;
         }
 
-        *::-webkit-scrollbar-thumb:hover {
-            background-color: var(--scrollbar-hover);
+        .project-preview:hover {
+            transform: scale(1.02);
+        }
+
+        .github-link {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            padding: 0.5rem 1rem;
+            border: 1px solid #00ff00;
+            border-radius: 4px;
+            transition: all 0.3s ease;
+            text-decoration: none;
+            color: #00ff00;
+        }
+
+        .github-link:hover {
+            background: rgba(0, 255, 0, 0.1);
+            transform: translateY(-2px);
+        }
+
+        @keyframes typing {
+            from { width: 0 }
+            to { width: 100% }
         }
     </style>
 </head>
-
 <body>
+    <canvas class="matrix-bg" id="matrix"></canvas>
     <div class="terminal">
-        <div class="prompt">cat ~/projects/SyncTrackerMobile.txt</div>
+        <div class="prompt">cat ~/projects/SyncTracker.txt</div>
 
-        <h1>SyncTracker Mobile</h1>
+        <h1><i class="fas fa-qrcode"></i> SyncTracker Mobile</h1>
         <p><strong>Description:</strong> SyncTracker Mobile is a React Native application designed for tracking student attendance using QR codes. It simplifies the process of attendance management for educational institutions.</p>
 
-        <h2>Features</h2>
+        <div class="project-preview">
+            <img src="assets/synctracker-preview.png" alt="SyncTracker Interface" style="width: 100%; height: auto;">
+        </div>
+
+        <h2><i class="fas fa-star"></i> Features</h2>
         <ul>
-            <li>QR code-based attendance tracking</li>
-            <li>Real-time attendance updates</li>
-            <li>Detailed attendance reports</li>
-            <li>Responsive design</li>
+            <li><i class="fas fa-qrcode"></i> QR code-based attendance tracking</li>
+            <li><i class="fas fa-sync"></i> Real-time attendance updates</li>
+            <li><i class="fas fa-chart-bar"></i> Detailed attendance reports</li>
+            <li><i class="fas fa-mobile-alt"></i> Responsive design</li>
         </ul>
 
-        <h2>Technologies Used</h2>
+        <h2><i class="fas fa-code"></i> Technologies Used</h2>
         <ul>
-            <li>React Native</li>
-            <li>JavaScript</li>
-            <li>Firebase</li>
+            <li><i class="fab fa-react"></i> React Native</li>
+            <li><i class="fab fa-js"></i> JavaScript</li>
+            <li><i class="fas fa-fire"></i> Firebase</li>
         </ul>
 
-        <h2>GitHub Repository</h2>
-        <p>Check out the project on GitHub: <a href="https://github.com/bariscanatakli/syncTracker-Mobile" target="_blank" rel="noopener noreferrer">https://github.com/bariscanatakli/syncTracker-Mobile</a></p>
+        <h2><i class="fab fa-github"></i> GitHub Repository</h2>
+        <p>
+            <a href="https://github.com/bariscanatakli/syncTracker-Mobile" 
+               target="_blank" 
+               rel="noopener noreferrer"
+               class="github-link">
+                <i class="fab fa-github"></i>
+                View Source Code
+                <i class="fas fa-external-link-alt"></i>
+            </a>
+        </p>
     </div>
-</body>
 
+    <script>
+        const canvas = document.getElementById('matrix');
+        const ctx = canvas.getContext('2d');
+        canvas.width = window.innerWidth;
+        canvas.height = window.innerHeight;
+        const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789@#$%^&*()';
+        const fontSize = 10;
+        const columns = canvas.width/fontSize;
+        const drops = new Array(Math.floor(columns)).fill(1);
+
+        function draw() {
+            ctx.fillStyle = 'rgba(0, 0, 0, 0.05)';
+            ctx.fillRect(0, 0, canvas.width, canvas.height);
+            ctx.fillStyle = '#0F0';
+            ctx.font = fontSize + 'px monospace';
+            
+            for(let i = 0; i < drops.length; i++) {
+                const text = chars[Math.floor(Math.random() * chars.length)];
+                ctx.fillText(text, i * fontSize, drops[i] * fontSize);
+                if(drops[i] * fontSize > canvas.height && Math.random() > 0.975)
+                    drops[i] = 0;
+                drops[i]++;
+            }
+        }
+
+        setInterval(draw, 33);
+
+        window.addEventListener('resize', () => {
+            canvas.width = window.innerWidth;
+            canvas.height = window.innerHeight;
+        });
+    </script>
+</body>
 </html>

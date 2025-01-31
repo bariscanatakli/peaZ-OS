@@ -1,56 +1,76 @@
 <!DOCTYPE html>
 <html lang="en">
-
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Whoami - Terminal</title>
+    <title>About - Terminal</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     <style>
         body {
             background: #1e1e1e;
             color: #00ff00;
             font-family: 'Courier New', monospace;
-            line-height: 1.6;
             margin: 0;
-            padding: 0;
-            display: flex;
-            justify-content: center;
-            align-items: center;
+            padding: 1rem;
             min-height: 100vh;
-            backdrop-filter: blur(5px);
+            display: flex;
+            align-items: center;
+            justify-content: center;
         }
 
         .terminal {
-            background: rgba(30, 30, 30, 0.95);
-            border: 1px solid #00ff00;
-            border-radius: 8px;
-            padding: 2rem;
+            width: 100%;
             max-width: 800px;
-            width: 90%;
-            max-height: 90vh;
-            overflow-y: auto;
-            color: #00ff00;
-            font-family: 'Courier New', monospace;
+            background: rgba(30, 30, 30, 0.95);
+            padding: 2rem;
+            border-radius: 8px;
+            box-shadow: 0 0 20px rgba(0, 255, 0, 0.1);
             position: relative;
-            box-shadow: 0 0 20px rgba(0, 255, 0, 0.2);
-            margin: 2rem;
-            scrollbar-width: thin;
-            scrollbar-color: #00ff00 rgba(30, 30, 30, 0.95);
+            overflow: visible;
+            margin: 1rem;
+        }
+
+        .section {
+            margin: 2rem 0;
+            padding: 1rem;
+            background: rgba(0, 255, 0, 0.05);
+            border-radius: 4px;
+            transition: all 0.3s ease;
+        }
+
+        .section:hover {
+            background: rgba(0, 255, 0, 0.08);
+            transform: translateX(5px);
         }
 
         h1 {
             color: #ffcc00;
-            text-align: center;
+            text-shadow: 0 0 10px rgba(255, 204, 0, 0.3);
             margin-bottom: 2rem;
         }
 
         h2 {
             color: #ffcc00;
+            text-shadow: 0 0 10px rgba(255, 204, 0, 0.3);
             margin-bottom: 1rem;
         }
 
-        .section {
-            margin: 2rem 0;
+        ul {
+            list-style-type: none;
+            padding-left: 1rem;
+        }
+
+        li {
+            margin: 0.8rem 0;
+            padding: 0.5rem;
+            transition: all 0.3s ease;
+            border-left: 2px solid transparent;
+        }
+
+        li:hover {
+            border-left: 2px solid #00ff00;
+            transform: translateX(5px);
+            background: rgba(0, 255, 0, 0.05);
         }
 
         .prompt:before {
@@ -59,118 +79,192 @@
             color: #00ff00;
         }
 
-        ul {
-            list-style: none;
-            padding: 0;
-        }
-
-        li {
-            margin: 1rem 0;
-            padding: 1rem;
-            background: rgba(40, 40, 40, 0.95);
+        a {
+            color: #00ff00;
+            text-decoration: none;
+            transition: all 0.3s ease;
+            display: inline-block;
+            margin-top: 0.5rem;
+            padding: 0.3rem 0.8rem;
+            border: 1px solid #00ff00;
             border-radius: 4px;
-            border: 1px solid rgba(0, 255, 0, 0.2);
         }
 
-        li strong {
+        a:hover {
+            color: #fff;
+            background: rgba(0, 255, 0, 0.1);
+            text-shadow: 0 0 10px #00ff00;
+            box-shadow: 0 0 15px rgba(0, 255, 0, 0.3);
+        }
+
+        .matrix-bg {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100vw;
+            height: 100vh;
+            z-index: -1;
+            opacity: 0.1;
+        }
+
+        /* Root Variables */
+        :root {
+            --scrollbar-bg: rgba(30, 30, 30, 0.95);
+            --scrollbar-thumb: #00ff00;
+            --scrollbar-hover: #33ff33;
+        }
+
+        /* Body Scrollbar - Firefox */
+        html {
+            scrollbar-width: thin;
+            scrollbar-color: var(--scrollbar-thumb) var(--scrollbar-bg);
+        }
+
+        /* Body Scrollbar - Webkit */
+        ::-webkit-scrollbar {
+            width: 8px;
+        }
+
+        ::-webkit-scrollbar-track {
+            background: var(--scrollbar-bg);
+        }
+
+        ::-webkit-scrollbar-thumb {
+            background-color: var(--scrollbar-thumb);
+            border-radius: 4px;
+            border: 2px solid var(--scrollbar-bg);
+        }
+
+        ::-webkit-scrollbar-thumb:hover {
+            background-color: var(--scrollbar-hover);
+        }
+
+        /* Remove Terminal Scrollbar */
+        .terminal {
+            -ms-overflow-style: none;
+            scrollbar-width: none;
+        }
+
+        .terminal::-webkit-scrollbar {
+            display: none;
+        }
+
+        @media (max-width: 768px) {
+            body {
+                padding: 0.5rem;
+            }
+            
+            .terminal {
+                padding: 1rem;
+                margin: 0.5rem;
+            }
+        }
+
+        .project-item {
+            margin: 1rem 0;
+        }
+
+        .project-item strong {
             color: #ffcc00;
             display: block;
             margin-bottom: 0.5rem;
         }
-
-        a {
-            color: #00ff00;
-            text-decoration: none;
-        }
-
-        a:hover {
-            text-decoration: underline;
-        }
-
-        /* Scrollbar Styles */
-        .terminal::-webkit-scrollbar {
-            width: 8px;
-        }
-
-        .terminal::-webkit-scrollbar-track {
-            background: rgba(30, 30, 30, 0.95);
-        }
-
-        .terminal::-webkit-scrollbar-thumb {
-            background-color: #00ff00;
-            border-radius: 4px;
-            border: 2px solid rgba(30, 30, 30, 0.95);
-        }
-
-        .terminal::-webkit-scrollbar-thumb:hover {
-            background-color: #33ff33;
-        }
-    </style>
     </style>
 </head>
-
 <body>
+    <canvas class="matrix-bg" id="matrix"></canvas>
     <div class="terminal">
         <div class="prompt">whoami</div>
-        <h1>Barış Can Ataklı</h1>
-        <p>Software engineering student and full-stack developer passionate about solving real-world problems with
-            technology.</p>
+        <div class="section">
+            <h1>Barış Can Ataklı</h1>
+            <p>Software engineering student and full-stack developer passionate about solving real-world problems with technology.</p>
+        </div>
 
         <div class="prompt">cat about.txt</div>
-        <p>I specialize in full-stack development using the MERN stack and have extensive experience with:</p>
-        <ul>
-            <li>Web Development</li>
-            <li>Mobile App Development</li>
-            <li>Cloud Solutions</li>
-            <li>AI and Machine Learning</li>
-            <li>Fullstack Development</li>
-        </ul>
+        <div class="section">
+            <h2>Specializations</h2>
+            <ul>
+                <li>Web Development</li>
+                <li>Mobile App Development</li>
+                <li>Cloud Solutions</li>
+                <li>AI and Machine Learning</li>
+                <li>Fullstack Development</li>
+            </ul>
+        </div>
 
         <div class="prompt">ls ~/notable_projects/</div>
-        <ul>
-            <li><strong>Arrhythmia Detection:</strong> Early detection of cardiac arrhythmias with deep learning.
-                <a href="https://github.com/bariscanatakli/arrhytmia_detection" target="_blank"
-                    rel="noopener noreferrer">GitHub</a>
-            </li>
-            <br>
-            <li><strong>peaZ-OS:</strong> Terminal-style portfolio website.
-                <a href="https://github.com/bariscanatakli/peaZ-OS" target="_blank" rel="noopener noreferrer">GitHub</a>
-            </li>
-            <br>
-            <li><strong>Netscope:</strong> Network analysis tools in Flutter.
-                <a href="https://github.com/bariscanatakli/netscope" target="_blank"
-                    rel="noopener noreferrer">GitHub</a>
-            </li>
-            <br>
-            <li><strong>Rota Point:</strong> Decentralized mapping on Solana blockchain.
-                <a href="https://github.com/yusufhoglu/teknofestFinal" target="_blank"
-                    rel="noopener noreferrer">GitHub</a>
-            </li>
-            <br>
-            <li><strong>Flight Route Planner:</strong> Flight Route Planner is a web-based application that helps users
-                find optimal flight routes between airports. Built with React and powered by advanced pathfinding
-                algorithms, it provides an interactive map interface for visualizing and planning flight paths.
-                <a href="https://github.com/bariscanatakli/flight-route-planner" target="_blank"
-                    rel="noopener noreferrer">GitHub</a>
-            </li>
-            <br>
-            <li><strong>BookNest - Book Recommendation System:</strong> A full-stack web application for managing and
-                recommending books using MongoDB, Express.js, React, and Node.js (MERN stack).
-                <a href="https://github.com/bariscanatakli/BookNest" target="_blank"
-                    rel="noopener noreferrer">GitHub</a>
-            </li>
-        </ul>
+        <div class="section">
+            <h2>Notable Projects</h2>
+            <ul>
+                <li class="project-item">
+                    <strong>Arrhythmia Detection</strong>
+                    Early detection of cardiac arrhythmias with deep learning.
+                    <a href="arrythmia_detection.html">View Details <i class="fas fa-arrow-right"></i></a>
+                </li>
+                <li class="project-item">
+                    <strong>peaZ-OS</strong>
+                    Terminal-style portfolio website.
+                    <a href="https://github.com/bariscanatakli/peaZ-OS">View Details <i class="fas fa-arrow-right"></i></a>
+                </li>
+                <!-- Add other projects similarly -->
+            </ul>
+        </div>
 
         <div class="prompt">cat ~/certifications.txt</div>
-        <ul>
-            <li>Advanced Python Programming - Udemy</li>
-            <li>Web Programming with ReactJS - BTK Akademi</li>
-            <li>High-Level Java - BTK Akademi</li>
-            <li>Full Stack Web Development - Udemy</li>
-            <li>PostgreSQL High Applicability - Linux Community</li>
-            <li>Web Application Security and Bug Bounty - Bogazici University Security Community</li>
-        </ul>
+        <div class="section">
+            <h2>Certifications</h2>
+            <ul>
+                <li>Advanced Python Programming - Udemy</li>
+                <li>Web Programming with ReactJS - BTK Akademi</li>
+                <li>High-Level Java - BTK Akademi</li>
+                <li>Full Stack Web Development - Udemy</li>
+                <li>PostgreSQL High Applicability - Linux Community</li>
+                <li>Web Application Security and Bug Bounty - Bogazici University Security Community</li>
+            </ul>
+        </div>
     </div>
-</body>
 
+    <script>
+        // Matrix rain effect
+        const canvas = document.getElementById('matrix');
+        const ctx = canvas.getContext('2d');
+
+        canvas.width = window.innerWidth;
+        canvas.height = window.innerHeight;
+
+        const characters = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789@#$%^&*()';
+        const fontSize = 10;
+        const columns = canvas.width / fontSize;
+
+        const drops = new Array(Math.floor(columns)).fill(1);
+
+        function draw() {
+            ctx.fillStyle = 'rgba(0, 0, 0, 0.05)';
+            ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+            ctx.fillStyle = '#0F0';
+            ctx.font = fontSize + 'px monospace';
+
+            for (let i = 0; i < drops.length; i++) {
+                const text = characters.charAt(Math.floor(Math.random() * characters.length));
+                ctx.fillText(text, i * fontSize, drops[i] * fontSize);
+
+                if (drops[i] * fontSize > canvas.height && Math.random() > 0.975) {
+                    drops[i] = 0;
+                }
+                drops[i]++;
+            }
+        }
+
+        setInterval(draw, 33);
+
+        window.addEventListener('resize', () => {
+            canvas.width = window.innerWidth;
+            canvas.height = window.innerHeight;
+            const columns = Math.floor(canvas.width / fontSize);
+            drops.length = columns;
+            drops.fill(1);
+        });
+    </script>
+</body>
 </html>
