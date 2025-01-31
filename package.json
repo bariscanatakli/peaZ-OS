@@ -14,13 +14,16 @@
     "@codemirror/theme-one-dark": "^6.1.2",
     "@reduxjs/toolkit": "^2.5.1",
     "@uiw/react-codemirror": "^4.23.7",
+    "dompurify": "^3.2.4",
     "firebase": "^11.2.0",
     "firebase-admin": "^13.0.2",
     "local-storage": "^2.0.0",
     "next": "latest",
     "react": "latest",
     "react-dom": "latest",
-    "react-redux": "^9.2.0"
+    "react-markdown": "^9.0.3",
+    "react-redux": "^9.2.0",
+    "react-syntax-highlighter": "^15.6.1"
   },
   "devDependencies": {
     "gh-pages": "^6.3.0"

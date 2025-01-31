@@ -16,9 +16,9 @@ const Editor = ({ id }) => {
 
     // Ensure content is string
     const [content, setContent] = useState(
-        typeof fileContent === 'string' ? fileContent : 
-        typeof fileContent === 'object' ? JSON.stringify(fileContent, null, 2) : 
-        ''
+        typeof fileContent === 'string' ? fileContent :
+            typeof fileContent === 'object' ? JSON.stringify(fileContent, null, 2) :
+                ''
     );
 
     const handleSave = async () => {
@@ -29,31 +29,56 @@ const Editor = ({ id }) => {
 
         try {
             console.log('Starting save operation:', editingFile);
-            
+
             if (!fileSystem || !fileSystem['~']) {
                 throw new Error('File system not initialized');
             }
-    
+
             const updatedFileSystem = JSON.parse(JSON.stringify(fileSystem));
-            const path = editingFile.substring(0, editingFile.lastIndexOf('/'));
-            const fileName = editingFile.split('/').pop();
-            
-            const parentDir = getDirectory(updatedFileSystem, path);
-            if (!parentDir || !parentDir.content[fileName]) {
-                throw new Error(`File ${editingFile} not found`);
+
+            // Fix path handling
+            const normalizedPath = editingFile.startsWith('/') ? editingFile.substring(1) : editingFile;
+            const pathParts = normalizedPath.split('/');
+            const fileName = pathParts.pop();
+            const dirPath = pathParts.join('/') || '/';
+
+            console.log('Debug:', {
+                normalizedPath,
+                dirPath,
+                fileName
+            });
+
+            // Get parent directory with improved error handling
+            const parentDir = getDirectory(updatedFileSystem, dirPath);
+            if (!parentDir) {
+                throw new Error(`Directory ${dirPath} not found`);
             }
-    
+            if (!parentDir.content) {
+                parentDir.content = {};
+            }
+            if (!parentDir.content[fileName]) {
+                // Create file if it doesn't exist
+                parentDir.content[fileName] = {
+                    type: 'file',
+                    content: ''
+                };
+            }
+
+            // Update file content
             parentDir.content[fileName].content = content;
-            
+
+            // Save changes
             dispatch(setFileSystem({ fileSystem: updatedFileSystem }));
             await saveFileSystem(updatedFileSystem);
 
             dispatch(setIsEditing({ terminalId: id, isEditing: false }));
             dispatch(setEditingFile({ terminalId: id, editingFile: null }));
             dispatch(setFileContent({ terminalId: id, content: '' }));
-    
+
         } catch (error) {
             console.error('Save error:', error);
+            // Add user feedback for the error
+            alert(`Error saving file: ${error.message}`);
         }
     };
 
@@ -65,8 +90,8 @@ const Editor = ({ id }) => {
 
     useEffect(() => {
         setContent(typeof fileContent === 'string' ? fileContent :
-                  typeof fileContent === 'object' ? JSON.stringify(fileContent, null, 2) : 
-                  '');
+            typeof fileContent === 'object' ? JSON.stringify(fileContent, null, 2) :
+                '');
     }, [fileContent]);
 
     const onChange = React.useCallback((value) => {
@@ -85,7 +110,7 @@ const Editor = ({ id }) => {
                 </div>
                 <CodeMirror
                     value={content || ''}
-                    height="400px" 
+                    height="400px"
                     theme="dark"
                     extensions={[markdown()]}
                     onChange={onChange}

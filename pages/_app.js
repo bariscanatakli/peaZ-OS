@@ -7,6 +7,10 @@ import '../styles/ResizeHandle.css';
 import '../styles/AutocompleteSuggestions.css';
 import '../styles/StartMenu.css';
 import '../styles/Editor.css';
+import '../styles/HelpGuide.css';
+import "../styles/Homepage.css";
+import "../styles/ContentViewer.css";
+
 import { Provider } from 'react-redux';
 import store from '../store';
 

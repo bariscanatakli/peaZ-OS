@@ -1,15 +1,18 @@
-import React from 'react'
-import Input from './Terminal/Input'
-import Output from './Terminal/Output'
+import React from 'react';
+import Input from './Terminal/Input';
+import Output from './Terminal/Output';
+import ContentViewer from './ContentViewer';
 import { useSelector } from 'react-redux';
 
 function TerminalComponent({ id }) {
-    const terminalState = useSelector(state => state.terminals.terminals.find(t => t.id === id));
-    const { content, output, role, path } = terminalState;
+  const terminalState = useSelector(state => 
+    state.terminals.terminals.find(t => t.id === id)
+  );
+  const { content, contentType, output, role, path } = terminalState;
 
-    return (
-        <div className="terminal">
-            {content && (
+  return (
+    <div className="terminal">
+      {content && (
                 <div
                     className="html-viewer"
                     dangerouslySetInnerHTML={{ __html: content }}
@@ -28,8 +31,8 @@ function TerminalComponent({ id }) {
                 </>
             )   }
 
-        </div>
-    );
+    </div>
+  );
 }
 
 export default TerminalComponent;

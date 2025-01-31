@@ -1,7 +1,9 @@
 .terminal {
     background-color: rgba(30, 30, 30, 0.95);
     /* Darker background */
-    color: #00ff00;
+    color: var(--primary-color);
+    line-height: 1.6;
+    padding: 1.5rem;
     /* Brighter green text */
     font-family: 'Courier New', monospace;
     padding: 20px;
@@ -15,11 +17,16 @@
     /* Add Flexbox properties */
     display: flex;
     flex-direction: column;
+
 }
 
 .terminal-container {
     /* Remove existing border if any */
-    border: none;
+    background: rgba(30, 30, 30, 0.98);
+    backdrop-filter: blur(10px);
+    border: 1px solid var(--border-color);
+    box-shadow: var(--shadow);
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
 
     /* Optionally, adjust border-radius or add a new one */
     border-radius: 8px;
@@ -40,12 +47,13 @@
     /* Consistent background */
     /* Removed border */
     box-shadow: 0 4px 10px rgba(0, 0, 0, 0.5);
+
     /* Added shadow */
     &.dragging {
         user-select: none;
         cursor: grabbing;
     }
-        
+
     &.resizing {
         cursor: nwse-resize;
     }
@@ -129,7 +137,7 @@
     /* Allow the output area to expand and be scrollable */
     flex-grow: 1;
     overflow-y: auto;
-
+    scroll-behavior: smooth; /* Add smooth scrolling */
     /* Existing scrollbar styles */
     scrollbar-width: thin;
     scrollbar-color: #00ff00 rgba(30, 30, 30, 0.95);
@@ -255,9 +263,11 @@
     cursor: pointer;
     /* Yellow */
 }
+
 .control-button.minimize:hover {
     opacity: 0.8;
 }
+
 .control-button.maximize {
     background-color: #28c940;
     /* Green */
@@ -275,18 +285,24 @@
 
 .input-line {
     display: flex;
-    align-items: baseline; /* Change from center to baseline */
-    line-height: 1.5; /* Ensure consistent line-height */
-    padding: 0; /* Remove any padding */
-    margin: 0; /* Remove any margin */
+    align-items: baseline;
+    /* Change from center to baseline */
+    line-height: 1.5;
+    /* Ensure consistent line-height */
+    padding: 0;
+    /* Remove any padding */
+    margin: 0;
+    /* Remove any margin */
 }
 
 .prompt {
     margin-right: 8px;
     line-height: 1.5;
-    font-size: 14px; /* Ensure font size matches input */
+    font-size: 14px;
+    /* Ensure font size matches input */
     padding: 0;
 }
+
 .terminal-input {
     flex: 1;
     height: 1.5em;
@@ -295,12 +311,15 @@
     border: none;
     color: #0f0;
     font-family: 'Courier New', monospace;
-    font-size: 14px; /* Ensure font size matches prompt */
+    font-size: 14px;
+    /* Ensure font size matches prompt */
     outline: none;
     padding: 0;
     margin: 0;
-    vertical-align: baseline; /* Align input vertically with prompt */
-    box-sizing: border-box; /* Ensure padding and border are included in height */
+    vertical-align: baseline;
+    /* Align input vertically with prompt */
+    box-sizing: border-box;
+    /* Ensure padding and border are included in height */
 }
 
 .terminal-container.maximized {
@@ -318,3 +337,4 @@
 .terminal-container.minimized {
     display: none !important;
 }
+

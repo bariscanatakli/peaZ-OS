@@ -16,6 +16,7 @@ import {
     setPath,
     setSuggestions,
     setHistoryIndex,
+    setInput,
     updateHistory,
     clearOutput,
 } from '../../../store/slices';
@@ -27,20 +28,20 @@ export const commands = {
         if (!fileSystem || !fileSystem['~']) {
             return 'ls: file system not initialized';
         }
-    
+
         const targetPath = args[0] || path || '/';
         const targetDir = getDirectory(fileSystem, targetPath);
-    
+
         if (!targetDir || targetDir.type !== 'dir') {
             return `ls: cannot access '${targetPath}': No such directory`;
         }
-    
+
         // Filter out system directories unless user is admin
         const items = Object.keys(targetDir.content).filter(item => {
             if (role === 'admin') return true;
             return !systemDirs.includes(item);
-        }); 
-    
+        });
+
         return items.length > 0 ? items.join('  ') : '';
     },
 
@@ -49,7 +50,7 @@ export const commands = {
         const targetPath = args[0];
         const resolvedPath = resolvePath(path, targetPath);
         const dir = getDirectory(fileSystem, resolvedPath);
-    
+
         if (dir && dir.type === 'dir') {
             // Debug: log terminalId and resolvedPath
             console.log('Dispatching setPath with terminalId:', state.id, 'resolvedPath:', resolvedPath);
@@ -121,40 +122,40 @@ export const commands = {
         if (role !== 'admin') {
             return 'rm: permission denied';
         }
-    
+
         if (args.length === 0) {
             return 'rm: missing operand';
         }
-    
+
         const fileName = args[0];
         const recursive = args.includes('-r') || args.includes('-R');
         const parentDir = getDirectory(fileSystem, path);
-    
+
         if (!parentDir) {
             return `rm: cannot remove '${fileName}': No such directory`;
         }
-    
+
         // Create deep copy of fileSystem
         const updatedFileSystem = JSON.parse(JSON.stringify(fileSystem));
         const updatedParentDir = getDirectory(updatedFileSystem, path);
-    
+
         if (!updatedParentDir.content[fileName]) {
             return `rm: cannot remove '${fileName}': No such file or directory`;
         }
-    
+
         if (updatedParentDir.content[fileName].type === 'dir' && !recursive) {
             return `rm: cannot remove '${fileName}': Is a directory`;
         }
-    
+
         // Delete file/directory
         delete updatedParentDir.content[fileName];
-    
+
         // Update Redux state using setFileSystem action
         dispatch(setFileSystem({ fileSystem: updatedFileSystem }));
-    
+
         // Save to Firebase
         await saveFileSystem(updatedFileSystem);
-    
+
         return `'${fileName}' removed successfully`;
     },
 
@@ -276,7 +277,11 @@ export const commands = {
             }
         }
     },
-    sudo: (args, fileSystem, path, dispatch, role) => {
+    sudo: (args, fileSystem, path, dispatch, role, state) => {
+        if (!state || !state.id) {
+            return 'sudo: terminal state not initialized';
+        }
+
         if (args.length === 0) {
             return 'sudo: no command specified';
         }
@@ -293,6 +298,19 @@ export const commands = {
                 command: 'su -'
             }));
 
+            dispatch(setInput({ terminalId: state.id, input: '' })); // Clear input
+            return 'Password: ';
+        }
+
+        // Handle other sudo commands
+        if (role !== 'admin') {
+            dispatch(setAwaitingPassword({
+                terminalId: state.id,
+                awaiting: true,
+                type: 'sudo',
+                command: args.join(' ')
+            }));
+            dispatch(setInput({ terminalId: state.id, input: '' })); // Clear input
             return 'Password: ';
         }
 
@@ -351,7 +369,7 @@ export const commands = {
 
         // Ensure file content is a string
         const fileContent = typeof file.content === 'string' ? file.content : JSON.stringify(file.content);
-   
+
         // Create new terminal with content
         const newTerminal = {
             id: Date.now(),
