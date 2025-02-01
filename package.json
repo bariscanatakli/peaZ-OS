@@ -7,7 +7,7 @@
     "dev": "next dev",
     "build": "next build",
     "start": "next start",
-    "deploy": "npm run build && gh-pages -d out"
+    "deploy": "next build && cd out && copy NUL .nojekyll && cd .. && gh-pages -d out --dotfiles"
   },
   "dependencies": {
     "@codemirror/lang-markdown": "^6.3.2",

@@ -160,6 +160,24 @@
                 margin: 0.5rem;
             }
         }
+
+        .terminal-btn {
+            background: transparent;
+            color: #00ff00;
+            border: 1px solid #00ff00;
+            padding: 8px 16px;
+            border-radius: 4px;
+            cursor: pointer;
+            font-family: 'Courier New', monospace;
+            margin-left: 10px;
+            transition: all 0.3s ease;
+        }
+
+        .terminal-btn:hover {
+            background: rgba(0, 255, 0, 0.1);
+            box-shadow: 0 0 15px rgba(0, 255, 0, 0.3);
+        }
+    </style>
     </style>
 </head>
 
@@ -175,11 +193,25 @@
                     <strong>BookNest</strong>
                     A MERN stack web app for book recommendations.
                     <a href="BookNest.html">View Details <i class="fas fa-arrow-right"></i></a>
+                    <button class="terminal-btn" onclick="window.parent.postMessage({
+                        type: 'CREATE_TERMINAL',
+                        path: '/projects/BookNest.html',
+                        project: 'BookNest'
+                    }, '*')">
+                        <i class="fas fa-terminal"></i> Open Terminal
+                    </button>
                 </li>
                 <li>
                     <strong>Flight Route Planner</strong>
-                    React-based app using pathfinding algorithms to find optimal flight routes.
+                    React-based app using pathfinding algorithms for optimal flight routes.
                     <a href="flight_route_planner.html">View Details <i class="fas fa-arrow-right"></i></a>
+                    <button class="terminal-btn" onclick="window.parent.postMessage({
+                    type: 'CREATE_TERMINAL',
+                    path: '/projects/flight-route_planner.html',
+                    project: 'Flight Route Planner'
+                }, '*')">
+                        <i class="fas fa-terminal"></i> Open Terminal
+                    </button>
                 </li>
             </ul>
         </div>
@@ -191,6 +223,13 @@
                     <strong>Netscope</strong>
                     A Flutter-based application for network analysis tools.
                     <a href="netscope.html">View Details <i class="fas fa-arrow-right"></i></a>
+                    <button class="terminal-btn" onclick="window.parent.postMessage({
+                        type: 'CREATE_TERMINAL',
+                        path: '/projects/netscope.html',
+                        project: 'Netscope'
+                    }, '*')">
+                        <i class="fas fa-terminal"></i> Open Terminal
+                    </button>
                 </li>
                 <li>
                     <strong>SyncTracker Mobile</strong>

@@ -84,6 +84,9 @@ export const terminalsSlice = createSlice({
       state.terminals = state.terminals.filter(t => t.id !== action.payload);
     },
 
+    setActiveProject: (state, action) => {
+      state.activeProject = action.payload;
+    },
     bringToFront: (state, action) => {
       state.currentZIndex++;
       const terminal = state.terminals.find(t => t.id === action.payload);
@@ -334,6 +337,7 @@ export const {
   setResizing,
   setResizeDirection,
   setUid,
+  setActiveProject,
 } = terminalsSlice.actions;
 
 export default terminalsSlice.reducer;
