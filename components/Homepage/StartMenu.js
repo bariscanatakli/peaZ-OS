@@ -1,7 +1,11 @@
 import React, { forwardRef } from 'react';
+import { useDispatch } from 'react-redux';
+import { addTerminal, setPath } from '../../store/slices';
 
-const StartMenu = forwardRef(({ onAddTerminal, onClose, setPath }, ref) => {
-    console.log(onAddTerminal)
+const StartMenu = forwardRef(({ onClose, setShowMenu }, ref) => {
+
+    const dispatch = useDispatch();
+
     const menuItems = [
         { label: 'New Terminal', path: '/' },
         { label: 'About', path: '/about' },
@@ -10,13 +14,18 @@ const StartMenu = forwardRef(({ onAddTerminal, onClose, setPath }, ref) => {
         { label: 'Contact', path: '/contact' }
     ];
 
-    const handleMenuClick = (path) => {
-        console.log(path)
-        setPath(path)
-        onAddTerminal(path);
-        onClose();
+    const handleMenuClick = (selectedPath) => {
+        const id = Date.now();
+        const key = `terminal-${id}-${Math.random().toString(36).substr(2, 9)}`;
+        dispatch(addTerminal({
+            id,
+            key,
+            path: selectedPath
+        }));
+        // dispatch(setPath({ terminalId: id, path: selectedPath }));
+        dispatch(setPath({ terminalId: id, path: selectedPath }));
+        setShowMenu(false);
     };
-
     return (
         <ul
             className="start-menu"

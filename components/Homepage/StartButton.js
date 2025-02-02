@@ -55,9 +55,8 @@ const StartButton = () => {
       {
         showMenu &&
         <StartMenu
-          setPath={setPath}
           ref={menuRef}
-          onAddTerminal={handleMenuClick}
+          setShowMenu={setShowMenu}
           onClose={() => setShowMenu(false)} />}
     </div>
   );

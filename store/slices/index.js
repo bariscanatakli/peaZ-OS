@@ -54,8 +54,16 @@ export const terminalsSlice = createSlice({
   initialState,
   reducers: {
     addTerminal: (state, action) => {
-      console.log(action.payload)
+
       const { id, key, content, editingFile, history, historyIndex, input, isEditing, isMinimized, output, path, position, role, } = action.payload;
+      // Calculate new position with offset
+      const newPosition = {
+
+
+        x: Math.min(window.innerWidth / 3 + state.positionOffset),
+        y: Math.min(window.innerHeight / 3 + state.positionOffset)
+      };
+
       const newTerminal = {
         ...terminalState,
         id,
@@ -63,7 +71,7 @@ export const terminalsSlice = createSlice({
         zIndex: state.currentZIndex + 1,
         input: '',
         output: ['Welcome to Terminal. Type "help" for available commands.'],
-        path: '/',
+        path: path || '/',
         role: role || 'guest',
         isEditing: isEditing || false,
         editingFile: editingFile || null,
@@ -71,13 +79,13 @@ export const terminalsSlice = createSlice({
         content: content || null,
         history: history || [],
         historyIndex: historyIndex || -1,
-
+        position: newPosition || getDefaultPosition(),
         isMinimized: isMinimized || false,
 
       };
       state.terminals.push(newTerminal);
       state.currentZIndex++;
-      state.positionOffset += 20;
+      state.positionOffset = (state.positionOffset + 25) % 200;
     },
 
     removeTerminal: (state, action) => {

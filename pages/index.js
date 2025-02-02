@@ -10,6 +10,8 @@ const Home = () => {
   const [showHelp, setShowHelp] = useState(false);
 
 
+  console.log(terminals);
+  
   return (
     <div className="home-container">
       <h1>Welcome to My Portfolio</h1>

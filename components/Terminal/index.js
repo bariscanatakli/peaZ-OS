@@ -54,7 +54,7 @@ const Terminal = ({
                 } else {
                     dispatch(setFileSystem({ fileSystem: fs }));
                 }
-                dispatch(setPath({ terminalId: id, path: '/' }));
+                dispatch(setPath({ terminalId: id, path: path || '/' }));
             } catch (error) {
                 console.error('Error initializing filesystem:', error);
             }
