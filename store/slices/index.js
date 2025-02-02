@@ -40,13 +40,16 @@ const terminalState = {
   dimensions: { width: 600, height: 400 },
   isResizing: false,
   resizeDirection: "",
+
+
 };
 
 const initialState = {
   terminals: [],
   currentZIndex: 1,
   positionOffset: 20,
-  fileSystem: null
+  fileSystem: null,
+  activeTerminalId: null,
 };
 
 export const terminalsSlice = createSlice({
@@ -82,6 +85,8 @@ export const terminalsSlice = createSlice({
         position: newPosition || getDefaultPosition(),
         isMinimized: isMinimized || false,
 
+
+
       };
       state.terminals.push(newTerminal);
       state.currentZIndex++;
@@ -113,6 +118,7 @@ export const terminalsSlice = createSlice({
 
     setActiveTerminalId: (state, action) => {
       state.activeTerminalId = action.payload;
+      console.log('Setting active terminal:', action.payload); // Debug
     },
     minimizeTerminal: (state, action) => {
       const terminal = state.terminals.find(t => t.id === action.payload);

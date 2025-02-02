@@ -7,9 +7,25 @@ import {
 } from '../../../store/slices';
 
 function Header({ id }) {
-    
+
     const dispatch = useDispatch();
-    const { isMaximized, position, isDragging, offset, refs, isResizing, resizeDirection, dimensions, isMinimized } = useSelector(state => state.terminals.terminals.find(t => t.id === id));
+    const terminalState =
+        useSelector((state) =>
+            state.terminals.terminals.find((t) => t.id === id)
+        ) || {};
+
+    // Destructure with default values to avoid undefined errors
+    const {
+        isMaximized = false,
+        isDragging = false,
+        offset = { x: 0, y: 0 },
+        refs = {},
+        isResizing = false,
+        resizeDirection = '',
+        dimensions = {},
+        isMinimized = false,
+        position = {},
+    } = terminalState;
 
     const handleMaximize = () => {
         dispatch(setMaximized({ terminalId: id, isMaximized: !isMaximized }))
@@ -17,7 +33,7 @@ function Header({ id }) {
 
     const handleMinimize = useCallback(() => {
         dispatch(minimizeTerminal(id));
-        dispatch(setActiveTerminalId(isMinimized ? id : null));
+        dispatch(setActiveTerminalId(id));
     }, [dispatch, id, isMinimized]);
 
     const onClose = () => {

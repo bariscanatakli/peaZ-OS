@@ -11,28 +11,12 @@ function Input({ id }) {
     const dispatch = useDispatch();
     const terminalState = useSelector(state => state.terminals.terminals.find(t => t.id === id));
     const { role, input, path } = terminalState;
-
-    const handleInputChange = useCallback((e) => {
-        dispatch(setInput({
-            terminalId: id,
-            input: e.target.value
-        }));
-    }, [dispatch, id]);
-
-
+    
     const inputRef = useCallback(node => {
         if (node !== null) {
             dispatch(setInputRef({ terminalId: id, ref: node }));
         }
     }, [dispatch, id]);
-    
-
-    const handleKeyDownEvent = useCallback((e) => {
-        if (!terminalState) return;
-        handleInput(e, dispatch, terminalState);
-    }, [dispatch, terminalState, id]);
-
-
 
     return (
         <div className="input-line">
@@ -41,8 +25,8 @@ function Input({ id }) {
                 ref={inputRef}
                 type="text"
                 value={input}
-                onChange={handleInputChange}
-                onKeyDown={handleKeyDownEvent}
+                onChange={(e) => dispatch(setInput({ terminalId: id, input: e.target.value }))}
+                onKeyDown={(e) => handleInput(e, dispatch, terminalState)}
                 className="terminal-input"
             />
         </div>

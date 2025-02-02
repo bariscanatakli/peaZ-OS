@@ -21,8 +21,8 @@
   .help-button:hover {
     transform: translateY(-2px);
     box-shadow: 0 4px 15px rgba(0, 255, 0, 0.4);
-    background: #33ff33;
-  }
+      background: #33ff33;
+    }
   
   .help-button span {
     font-size: 1.2em;

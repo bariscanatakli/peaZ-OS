@@ -6,11 +6,11 @@ import StartButton from '../components/Homepage/StartButton';
 import HelpGuide from '../components/Homepage/HelpGuide';
 
 const Home = () => {
-  const { terminals } = useSelector(state => state.terminals);
+  const { terminals, activeTerminalId } = useSelector(state => state.terminals);
   const [showHelp, setShowHelp] = useState(false);
 
 
-  console.log(terminals);
+  console.log(activeTerminalId);
   
   return (
     <div className="home-container">

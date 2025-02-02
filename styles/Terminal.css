@@ -57,6 +57,11 @@
     &.resizing {
         cursor: nwse-resize;
     }
+
+    &:focus-within {
+        box-shadow: 0 0 0 2px rgba(0, 255, 0, 0.3);
+        /* Optional: shows focus state */
+    }
 }
 
 .terminal-container.open {
@@ -137,7 +142,8 @@
     /* Allow the output area to expand and be scrollable */
     flex-grow: 1;
     overflow-y: auto;
-    scroll-behavior: smooth; /* Add smooth scrolling */
+    scroll-behavior: smooth;
+    /* Add smooth scrolling */
     /* Existing scrollbar styles */
     scrollbar-width: thin;
     scrollbar-color: #00ff00 rgba(30, 30, 30, 0.95);
@@ -338,3 +344,8 @@
     display: none !important;
 }
 
+.terminal-input:focus {
+    outline: none;
+    caret-color: #00ff00;
+    /* Makes cursor visible */
+}
