@@ -1,23 +1,59 @@
 .terminal {
     background-color: rgba(30, 30, 30, 0.95);
-    /* Darker background */
-    color: var(--primary-color);
-    line-height: 1.6;
-    padding: 1.5rem;
-    /* Brighter green text */
+    color: #00ff00;
     font-family: 'Courier New', monospace;
     padding: 20px;
-    height: 100%;
+    height: calc(100% - 30px);
     width: 100%;
-    border-radius: 8px;
-    /* Rounded corners */
-    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.5);
-    /* Added shadow */
-    transition: all 0.3s ease;
-    /* Add Flexbox properties */
-    display: flex;
-    flex-direction: column;
+    border-bottom-left-radius: 8px;
+    border-bottom-right-radius: 8px;
+    box-sizing: border-box;
+    overflow: hidden;
+    font-size: 14px; /* Base font size */
+}
 
+
+/* Scale up text for larger screens */
+@media (min-width: 1440px) {
+    .terminal {
+        font-size: 16px;
+    }
+    
+    .terminal-input {
+        font-size: 16px;
+    }
+    
+    .prompt {
+        font-size: 16px;
+    }
+}
+
+@media (min-width: 1920px) {
+    .terminal {
+        font-size: 18px;
+    }
+    
+    .terminal-input {
+        font-size: 18px;
+    }
+    
+    .prompt {
+        font-size: 18px;
+    }
+}
+
+@media (min-width: 2560px) {
+    .terminal {
+        font-size: 20px;
+    }
+    
+    .terminal-input {
+        font-size: 20px;
+    }
+    
+    .prompt {
+        font-size: 20px;
+    }
 }
 
 .terminal-container {
@@ -38,8 +74,8 @@
     top: 50%;
     left: 50%;
     transform: translate(-50%, -50%);
-    min-width: 600px;
-    min-height: 400px;
+    min-width: 300px;
+    min-height: 200px;
     resize: both;
     overflow: auto;
     z-index: 999;
@@ -58,10 +94,16 @@
         cursor: nwse-resize;
     }
 
-    &:focus-within {
-        box-shadow: 0 0 0 2px rgba(0, 255, 0, 0.3);
-        /* Optional: shows focus state */
+    &:focus,
+    &.active {
+        box-shadow: 0 0 0 2px rgba(0, 255, 0, 0.3) !important;
     }
+}
+
+
+.terminal-container:focus,
+.terminal-container.active {
+  box-shadow: 0 0 0 2px rgba(0, 255, 0, 0.3) !important;
 }
 
 .terminal-container.open {
@@ -192,58 +234,7 @@
 
 
 
-@media (max-width: 768px) {
-    .terminal-container {
-        width: 90%;
-        height: 60%;
-        top: 50%;
-        left: 50%;
-        transform: translate(-50%, -50%);
-        min-width: unset;
-        min-height: unset;
-    }
 
-    .floating-button {
-        bottom: 15px;
-        right: 15px;
-        padding: 12px;
-    }
-
-    .terminal-header {
-        padding: 8px 12px;
-    }
-
-    .terminal-input {
-        font-size: 14px;
-    }
-
-    /* Adjust window controls for better touch accessibility */
-    .control-button {
-        width: 20px;
-        height: 20px;
-    }
-}
-
-@media (max-width: 480px) {
-    .terminal-container {
-        width: 95%;
-        height: 70%;
-    }
-
-    .terminal-header {
-        flex-direction: column;
-        align-items: flex-start;
-    }
-
-    .window-controls {
-        gap: 8px;
-    }
-
-    .control-button {
-        width: 22px;
-        height: 22px;
-    }
-}
 
 .window-controls {
     display: flex;

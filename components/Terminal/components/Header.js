@@ -22,7 +22,7 @@ function Header({ id }) {
         refs = {},
         isResizing = false,
         resizeDirection = '',
-        dimensions = {},
+        dimensions,
         isMinimized = false,
         position = {},
     } = terminalState;
@@ -47,31 +47,30 @@ function Header({ id }) {
             if (isDragging) {
                 const newX = e.clientX - offset.x;
                 const newY = e.clientY - offset.y;
-                const terminalWidth = refs?.terminal?.offsetWidth || 0;
-                const terminalHeight = refs?.terminal?.offsetHeight || 0;
 
-                // Screen boundaries
-                const screenDimensions = {
-                    left: terminalWidth,
-                    bottom: window.innerHeight - terminalHeight / 2,
-                    right: window.innerWidth - terminalWidth / 2,
-                    top: window.innerHeight + terminalHeight / 2
-                };
+                // Get window dimensions
+                const windowWidth = window.innerWidth;
+                const windowHeight = window.innerHeight;
 
-                // Constrain position within screen bounds
+                const taskbarHeight = document.querySelector('.taskbar')?.offsetHeight || 0;
 
-                dispatch(setPosition({ terminalId: id, position: { x: Math.max(screenDimensions.left / 2, Math.min(screenDimensions.right, newX)), y: Math.max(200, Math.min(screenDimensions.bottom, newY)) } }));
-            } else if (isResizing) {
-                const newWidth = resizeDirection.includes('right') ?
-                    e.clientX - position.x : dimensions.width;
-                const newHeight = resizeDirection.includes('bottom') ?
-                    e.clientY - position.y : dimensions.height;
+                // Minimum distances from edges
+                const minX = dimensions.width / 2 + 4;
+                const minY = dimensions.height / 2 + 4;
 
-                dispatch(setDimensions({
+                // Calculate boundaries considering terminal dimensions
+                const maxX = windowWidth - dimensions.width / 2 - 4;
+                const maxY = windowHeight - dimensions.height / 2 - taskbarHeight - 4;
+
+                // Clamp position within boundaries (min and max)
+                const clampedX = Math.max(minX, Math.min(maxX, newX));
+                const clampedY = Math.max(minY, Math.min(maxY, newY));
+
+                dispatch(setPosition({
                     terminalId: id,
-                    dimensions: {
-                        width: Math.max(300, newWidth),
-                        height: Math.max(200, newHeight)
+                    position: {
+                        x: clampedX,
+                        y: clampedY
                     }
                 }));
             }

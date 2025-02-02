@@ -10,7 +10,7 @@ const Home = () => {
   const [showHelp, setShowHelp] = useState(false);
 
 
-  console.log(activeTerminalId);
+  console.log(terminals);
   
   return (
     <div className="home-container">

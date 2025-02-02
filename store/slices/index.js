@@ -7,7 +7,16 @@ const getDefaultPosition = () => {
   }
   return { x: 0, y: 0 };
 };
+const calculateTerminalDimensions = () => {
+  // Safely detect window
+  if (typeof window === 'undefined') {
+    return { width: 800, height: 600 };
+  }
 
+  const width = Math.max(window.innerWidth * 0.6, 600);
+  const height = Math.max(window.innerHeight * 0.7, 400);
+  return { width, height };
+};
 
 
 const terminalState = {
@@ -37,7 +46,7 @@ const terminalState = {
   isMinimized: false,
   isMaximized: false,
   position: getDefaultPosition(),
-  dimensions: { width: 600, height: 400 },
+  dimensions: calculateTerminalDimensions(),
   isResizing: false,
   resizeDirection: "",
 
@@ -63,8 +72,8 @@ export const terminalsSlice = createSlice({
       const newPosition = {
 
 
-        x: Math.min(window.innerWidth / 3 + state.positionOffset),
-        y: Math.min(window.innerHeight / 3 + state.positionOffset)
+        x: Math.min(window.innerWidth / 2 + state.positionOffset),
+        y: Math.min(window.innerHeight / 2 + state.positionOffset)
       };
 
       const newTerminal = {
@@ -278,6 +287,7 @@ export const terminalsSlice = createSlice({
     setMaximized: (state, action) => {
       const { terminalId, isMaximized } = action.payload;
       const terminal = state.terminals.find(t => t.id === terminalId);
+      terminal.dimensions = { width: 600, height: 400 }
       if (terminal) {
         terminal.isMaximized = isMaximized;
       }

@@ -45,8 +45,10 @@ const TerminalButton = ({ terminal }) => {
 
   const handleClick = (e) => {
     e.stopPropagation();
-    dispatch(setActiveTerminalId(terminal.id));
+    setShowMenu(true);
+
     dispatch(bringToFront(terminal.id));
+    dispatch(setActiveTerminalId(terminal.id));
   };
 
   const handleClickOutside = useCallback((e) => {
@@ -103,7 +105,7 @@ const TerminalButton = ({ terminal }) => {
           }}
           onMouseLeave={handleMouseLeave}
         >
-          <li onClick={(e) => { e.stopPropagation(); setShowInfo(true); setShowMenu(false); }}>Edit Terminal</li>
+          <li onClick={(e) => { e.stopPropagation(); setShowInfo(true); setShowMenu(false); }}>Information</li>
           <li onClick={(e) => { e.stopPropagation(); dispatch(setMaximized({ terminalId: terminal.id, isMaximized: !terminal.isMaximized })); setShowMenu(false); }}>
             {terminal.isMaximized ? 'Restore' : 'Maximize'}
           </li>

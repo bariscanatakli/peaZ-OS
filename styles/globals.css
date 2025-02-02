@@ -1,19 +1,22 @@
-html, body {
-    margin: 0;
-    padding: 0;
-    background-color: #1e1e1e;
-    font-family: 'Cascadia Code', 'Fira Code', 'Consolas', monospace; /* Better terminal fonts */
-    -webkit-font-smoothing: antialiased;
-    -moz-osx-font-smoothing: grayscale;
-  }
-  
-  /* Add CSS variables for consistent theming */
-  :root {
-    --primary-color: #00ff00;
-    --primary-hover: #33ff33;
-    --bg-dark: #1e1e1e;
-    --bg-lighter: #2e2e2e;
-    --accent-color: #ffcc00;
-    --border-color: #444;
-    --shadow: 0 4px 10px rgba(0, 0, 0, 0.5);
-  }
+html,
+body {
+  margin: 0;
+  padding: 0;
+  background-color: #1e1e1e;
+  font-family: 'Cascadia Code', 'Fira Code', 'Consolas', monospace;
+  /* Better terminal fonts */
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+/* Add CSS variables for consistent theming */
+:root {
+  --primary-color: #00ff00;
+  --primary-hover: #33ff33;
+  --bg-dark: #1e1e1e;
+  --bg-lighter: #2e2e2e;
+  --accent-color: #ffcc00;
+  --border-color: #444;
+  --shadow: 0 4px 10px rgba(0, 0, 0, 0.5);
+}
+
