@@ -180,6 +180,35 @@ const HelpGuide = ({ onClose }) => {
                     </ul>
                 </section>
 
+
+                <section className="guide-section">
+                    <h2>🔐 How to Login</h2>
+
+                    <ul className="tips-list">
+                        <li>
+                            <strong>login dummyadmin dummypass</strong>
+                            <span>Use this command to login with the admin credentials. You can only use commands at folder public.</span>
+                        </li>
+                        <li>
+                            <strong>Example</strong>
+                            <span>
+                                <div
+                                    key={`login`}
+                                    className={`command-item`}
+                                    onClick={() => handleCommandClick(`login`)}
+                                >
+                                    <code>guest@peaZ-OS:/ login dummyadmin@dummy.com dummypass
+                                    </code>
+                                    <code>Welcome dummyadmin. Logged in as dumymadmin.</code>
+                                    <span></span>
+                                </div>
+
+                            </span>
+                        </li>
+
+                    </ul>
+
+                </section>
                 <section className="guide-section">
                     <h2>🛠️ Available Commands</h2>
 

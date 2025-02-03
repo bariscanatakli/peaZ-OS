@@ -14,7 +14,11 @@ const Home = () => {
   return (
     <div className="home-container">
       <h1>Welcome to My Portfolio</h1>
-      <p>Interact with the terminal below to navigate through my projects.</p>
+      <div className="update-banner">
+        <p>Check out my latest updates and projects!</p>
+      </div>
+      <p>Click on the terminal icon in the taskbar below to open a new terminal.</p>
+      <p>For help with the terminal, click the help button below.</p>
 
       <button
         className="help-button"
@@ -37,7 +41,7 @@ const Home = () => {
           <TerminalButton
             key={terminal.id}
             terminal={terminal}
-          />
+          />  
         ))}
       </div>
     </div>
