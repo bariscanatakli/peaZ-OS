@@ -128,12 +128,39 @@
         .terminal::-webkit-scrollbar {
             display: none;
         }
+
+        .terminal-header {
+            border-bottom: 1px solid #00ff00;
+            padding-bottom: 1rem;
+            margin-bottom: 2rem;
+            font-size: 0.8rem;
+            opacity: 0.7;
+        }
+
+        .prompt {
+            margin-bottom: 1.5rem;
+            opacity: 0.8;
+            animation: typing 2s steps(40, end);
+            white-space: nowrap;
+            overflow: hidden;
+            border-right: 2px solid #00ff00;
+        }
+
+        .prompt:before {
+            content: "guest@portfolio:~$ ";
+            color: #ffcc00;
+        }
     </style>
 </head>
 
 <body>
     <canvas class="matrix-bg" id="matrix"></canvas>
     <div class="terminal">
+        <div class="terminal-header">
+            <div>System: Windows_NT x64 10.0.19044</div>
+            <div>Shell: PowerShell v7.3.4</div>
+            <div>Time: <span id="current-time"></span></div>
+        </div>
         <h1>Contact Me</h1>
         <p>Reach out through any of these channels:</p>
         <div class="social-links">
@@ -142,35 +169,51 @@
             <a href="https://www.linkedin.com/in/bar%C4%B1%C5%9F-can-atakl%C4%B1-414184203/" target="_blank"
                 title="LinkedIn"><i class="fab fa-linkedin"></i></a>
         </div>
-        <form id="contactForm">
+        <!-- <form id="contactForm">
             <input type="text" placeholder="Name" required>
             <input type="email" placeholder="Email" required>
             <textarea placeholder="Message" rows="5" required></textarea>
             <button type="submit">SEND MESSAGE</button>
-        </form>
+        </form> -->
     </div>
     <script>
+        // Matrix background animation
         const canvas = document.getElementById('matrix');
         const ctx = canvas.getContext('2d');
         canvas.width = window.innerWidth;
         canvas.height = window.innerHeight;
-        const characters = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789@#$%^&*()';
+        const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789@#$%^&*()';
         const fontSize = 10;
-        const columns = Math.floor(canvas.width / fontSize);
-        const drops = new Array(columns).fill(1);
+        const columns = canvas.width / fontSize;
+        const drops = new Array(Math.floor(columns)).fill(1);
+
         function draw() {
             ctx.fillStyle = 'rgba(0, 0, 0, 0.05)';
             ctx.fillRect(0, 0, canvas.width, canvas.height);
             ctx.fillStyle = '#0F0';
-            ctx.font = `${fontSize}px monospace`;
-            drops.forEach((y, i) => {
-                const text = characters[Math.floor(Math.random() * characters.length)];
-                ctx.fillText(text, i * fontSize, y * fontSize);
-                drops[i] = y * fontSize > canvas.height && Math.random() > 0.975 ? 0 : y + 1;
-            });
-            requestAnimationFrame(draw);
+            ctx.font = fontSize + 'px monospace';
+
+            for (let i = 0; i < drops.length; i++) {
+                const text = chars[Math.floor(Math.random() * chars.length)];
+                ctx.fillText(text, i * fontSize, drops[i] * fontSize);
+                if (drops[i] * fontSize > canvas.height && Math.random() > 0.975)
+                    drops[i] = 0;
+                drops[i]++;
+            }
         }
-        draw();
+
+        setInterval(draw, 33);
+
+        // Update current time
+        function updateTime() {
+            const now = new Date();
+            document.getElementById('current-time').textContent =
+                now.toLocaleTimeString('en-US', { hour12: false });
+        }
+
+        updateTime();
+        setInterval(updateTime, 1000);
+
         window.addEventListener('resize', () => {
             canvas.width = window.innerWidth;
             canvas.height = window.innerHeight;
@@ -179,10 +222,6 @@
             const columns = Math.floor(canvas.width / fontSize);
             drops.length = columns; // Resize the array
             drops.fill(1); // Reset drop positions
-        });
-        document.getElementById('contactForm').addEventListener('submit', e => {
-            e.preventDefault();
-            alert('Message Sent!');
         });
     </script>
 </body>

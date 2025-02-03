@@ -7,6 +7,67 @@
     <title>Skills - Terminal</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     <style>
+        /* Root Variables */
+        :root {
+            --scrollbar-bg: rgba(30, 30, 30, 0.95);
+            --scrollbar-thumb: #00ff00;
+            --scrollbar-hover: #33ff33;
+        }
+
+        /* Body Scrollbar - Firefox */
+        html {
+            scrollbar-width: thin;
+            scrollbar-color: var(--scrollbar-thumb) var(--scrollbar-bg);
+        }
+
+        .terminal-header {
+            border-bottom: 1px solid #00ff00;
+            padding-bottom: 1rem;
+            margin-bottom: 2rem;
+            font-size: 0.8rem;
+            opacity: 0.7;
+        }
+
+        /* Body Scrollbar - Webkit */
+        ::-webkit-scrollbar {
+            width: 8px;
+        }
+
+        ::-webkit-scrollbar-track {
+            background: var(--scrollbar-bg);
+        }
+
+        ::-webkit-scrollbar-thumb {
+            background-color: var(--scrollbar-thumb);
+            border-radius: 4px;
+            border: 2px solid var(--scrollbar-bg);
+        }
+
+        ::-webkit-scrollbar-thumb:hover {
+            background-color: var(--scrollbar-hover);
+        }
+
+        /* Remove Terminal Scrollbar */
+        .terminal {
+            -ms-overflow-style: none;
+            scrollbar-width: none;
+        }
+
+        .terminal::-webkit-scrollbar {
+            display: none;
+        }
+
+        @media (max-width: 768px) {
+            body {
+                padding: 0.5rem;
+            }
+
+            .terminal {
+                padding: 1rem;
+                margin: 0.5rem;
+            }
+        }
+
         body {
             background: #1e1e1e;
             color: #00ff00;
@@ -66,10 +127,18 @@
             text-shadow: 0 0 10px #00ff00;
         }
 
+        .prompt {
+            margin-bottom: 1.5rem;
+            opacity: 0.8;
+            animation: typing 2s steps(40, end);
+            white-space: nowrap;
+            overflow: hidden;
+            border-right: 2px solid #00ff00;
+        }
+
         .prompt:before {
             content: "guest@portfolio:~$ ";
-            opacity: 0.8;
-            color: #00ff00;
+            color: #ffcc00;
         }
 
         a {
@@ -92,59 +161,6 @@
             z-index: -1;
             opacity: 0.1;
         }
-
-        /* Root Variables */
-        :root {
-            --scrollbar-bg: rgba(30, 30, 30, 0.95);
-            --scrollbar-thumb: #00ff00;
-            --scrollbar-hover: #33ff33;
-        }
-
-        /* Body Scrollbar - Firefox */
-        html {
-            scrollbar-width: thin;
-            scrollbar-color: var(--scrollbar-thumb) var(--scrollbar-bg);
-        }
-
-        /* Body Scrollbar - Webkit */
-        ::-webkit-scrollbar {
-            width: 8px;
-        }
-
-        ::-webkit-scrollbar-track {
-            background: var(--scrollbar-bg);
-        }
-
-        ::-webkit-scrollbar-thumb {
-            background-color: var(--scrollbar-thumb);
-            border-radius: 4px;
-            border: 2px solid var(--scrollbar-bg);
-        }
-
-        ::-webkit-scrollbar-thumb:hover {
-            background-color: var(--scrollbar-hover);
-        }
-
-        /* Remove Terminal Scrollbar */
-        .terminal {
-            -ms-overflow-style: none;
-            scrollbar-width: none;
-        }
-
-        .terminal::-webkit-scrollbar {
-            display: none;
-        }
-
-        @media (max-width: 768px) {
-            body {
-                padding: 0.5rem;
-            }
-
-            .terminal {
-                padding: 1rem;
-                margin: 0.5rem;
-            }
-        }
     </style>
 </head>
 
@@ -152,6 +168,11 @@
     <canvas class="matrix-bg" id="matrix"></canvas>
     <!-- Existing terminal content -->
     <div class="terminal">
+        <div class="terminal-header">
+            <div>System: Windows_NT x64 10.0.19044</div>
+            <div>Shell: PowerShell v7.3.4</div>
+            <div>Time: <span id="current-time"></span></div>
+        </div>
         <div class="prompt">ls ~/skills/</div>
 
         <div class="skill-category">
@@ -264,44 +285,48 @@
         </div>
     </div>
     <script>
-        // Matrix rain effect
+        // Matrix background animation
         const canvas = document.getElementById('matrix');
         const ctx = canvas.getContext('2d');
-
         canvas.width = window.innerWidth;
         canvas.height = window.innerHeight;
-
-        const characters = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789@#$%^&*()';
+        const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789@#$%^&*()';
         const fontSize = 10;
         const columns = canvas.width / fontSize;
-
         const drops = new Array(Math.floor(columns)).fill(1);
 
         function draw() {
             ctx.fillStyle = 'rgba(0, 0, 0, 0.05)';
             ctx.fillRect(0, 0, canvas.width, canvas.height);
-
             ctx.fillStyle = '#0F0';
             ctx.font = fontSize + 'px monospace';
 
             for (let i = 0; i < drops.length; i++) {
-                const text = characters.charAt(Math.floor(Math.random() * characters.length));
+                const text = chars[Math.floor(Math.random() * chars.length)];
                 ctx.fillText(text, i * fontSize, drops[i] * fontSize);
-
-                if (drops[i] * fontSize > canvas.height && Math.random() > 0.975) {
+                if (drops[i] * fontSize > canvas.height && Math.random() > 0.975)
                     drops[i] = 0;
-                }
                 drops[i]++;
             }
         }
 
         setInterval(draw, 33);
 
+        // Update current time
+        function updateTime() {
+            const now = new Date();
+            document.getElementById('current-time').textContent =
+                now.toLocaleTimeString('en-US', { hour12: false });
+        }
+
+        updateTime();
+        setInterval(updateTime, 1000);
+
         window.addEventListener('resize', () => {
             canvas.width = window.innerWidth;
             canvas.height = window.innerHeight;
 
-            // Recalculate columns and reset drFops array
+            // Recalculate columns and reset drops array
             const columns = Math.floor(canvas.width / fontSize);
             drops.length = columns; // Resize the array
             drops.fill(1); // Reset drop positions

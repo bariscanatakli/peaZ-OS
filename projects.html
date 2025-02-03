@@ -177,6 +177,82 @@
             background: rgba(0, 255, 0, 0.1);
             box-shadow: 0 0 15px rgba(0, 255, 0, 0.3);
         }
+
+        .terminal-header {
+            border-bottom: 1px solid #00ff00;
+            padding-bottom: 1rem;
+            margin-bottom: 2rem;
+            font-size: 0.8rem;
+            opacity: 0.7;
+        }
+
+        .prompt {
+            margin-bottom: 1.5rem;
+            opacity: 0.8;
+            animation: typing 2s steps(40, end);
+            white-space: nowrap;
+            overflow: hidden;
+            border-right: 2px solid #00ff00;
+        }
+
+        .prompt:before {
+            content: "guest@portfolio:~$ ";
+            color: #ffcc00;
+        }
+
+
+        /* Root Variables */
+        :root {
+            --scrollbar-bg: rgba(30, 30, 30, 0.95);
+            --scrollbar-thumb: #00ff00;
+            --scrollbar-hover: #33ff33;
+        }
+
+        /* Body Scrollbar - Firefox */
+        html {
+            scrollbar-width: thin;
+            scrollbar-color: var(--scrollbar-thumb) var(--scrollbar-bg);
+        }
+
+        /* Body Scrollbar - Webkit */
+        ::-webkit-scrollbar {
+            width: 8px;
+        }
+
+        ::-webkit-scrollbar-track {
+            background: var(--scrollbar-bg);
+        }
+
+        ::-webkit-scrollbar-thumb {
+            background-color: var(--scrollbar-thumb);
+            border-radius: 4px;
+            border: 2px solid var(--scrollbar-bg);
+        }
+
+        ::-webkit-scrollbar-thumb:hover {
+            background-color: var(--scrollbar-hover);
+        }
+
+        /* Remove Terminal Scrollbar */
+        .terminal {
+            -ms-overflow-style: none;
+            scrollbar-width: none;
+        }
+
+        .terminal::-webkit-scrollbar {
+            display: none;
+        }
+
+        @media (max-width: 768px) {
+            body {
+                padding: 0.5rem;
+            }
+
+            .terminal {
+                padding: 1rem;
+                margin: 0.5rem;
+            }
+        }
     </style>
     </style>
 </head>
@@ -184,6 +260,13 @@
 <body>
     <canvas class="matrix-bg" id="matrix"></canvas>
     <div class="terminal">
+
+        <div class="terminal-header">
+            <div>System: Windows_NT x64 10.0.19044</div>
+            <div>Shell: PowerShell v7.3.4</div>
+            <div>Time: <span id="current-time"></span></div>
+        </div>
+
         <div class="prompt">ls ~/projects/</div>
 
         <div class="project-category">
@@ -192,25 +275,25 @@
                 <li>
                     <strong>BookNest</strong>
                     A MERN stack web app for book recommendations.
-                    <a href="BookNest.html">View Details <i class="fas fa-arrow-right"></i></a>
+
                     <button class="terminal-btn" onclick="window.parent.postMessage({
                         type: 'CREATE_TERMINAL',
-                        path: '/projects/BookNest.html',
+                        path: 'BookNest.html',
                         project: 'BookNest'
                     }, '*')">
-                        <i class="fas fa-terminal"></i> Open Terminal
+                        <i class="fas fa-terminal"></i> View Details
                     </button>
                 </li>
                 <li>
                     <strong>Flight Route Planner</strong>
                     React-based app using pathfinding algorithms for optimal flight routes.
-                    <a href="flight_route_planner.html">View Details <i class="fas fa-arrow-right"></i></a>
+
                     <button class="terminal-btn" onclick="window.parent.postMessage({
                     type: 'CREATE_TERMINAL',
-                    path: '/projects/flight-route_planner.html',
+                    path: 'flight_route_planner.html',
                     project: 'Flight Route Planner'
                 }, '*')">
-                        <i class="fas fa-terminal"></i> Open Terminal
+                        <i class="fas fa-terminal"></i> View Details
                     </button>
                 </li>
             </ul>
@@ -222,19 +305,26 @@
                 <li>
                     <strong>Netscope</strong>
                     A Flutter-based application for network analysis tools.
-                    <a href="netscope.html">View Details <i class="fas fa-arrow-right"></i></a>
+
                     <button class="terminal-btn" onclick="window.parent.postMessage({
                         type: 'CREATE_TERMINAL',
-                        path: '/projects/netscope.html',
+                        path: 'netscope.html',
                         project: 'Netscope'
                     }, '*')">
-                        <i class="fas fa-terminal"></i> Open Terminal
+                        <i class="fas fa-terminal"></i> View Details
                     </button>
                 </li>
                 <li>
                     <strong>SyncTracker Mobile</strong>
                     React Native app for tracking student attendance using QR codes.
-                    <a href="syncTracker.html">View Details <i class="fas fa-arrow-right"></i></a>
+                    <button class="terminal-btn" onclick="window.parent.postMessage({
+                        type: 'CREATE_TERMINAL',
+                        path: 'syncTracker.html',
+                        project: 'syncTracker'
+                    }, '*')">
+                        <i class="fas fa-terminal"></i>View Details
+                    </button>
+
                 </li>
             </ul>
         </div>
@@ -245,7 +335,14 @@
                 <li>
                     <strong>Rota Point</strong>
                     Decentralized mapping network on Solana blockchain.
-                    <a href="rota_point.html">View Details <i class="fas fa-arrow-right"></i></a>
+
+                    <button class="terminal-btn" onclick="window.parent.postMessage({
+                        type: 'CREATE_TERMINAL',
+                        path: 'rota_point.html',
+                        project: 'Rota Point'
+                    }, '*')">
+                        <i class="fas fa-terminal"></i> View Details
+                    </button>
                 </li>
             </ul>
         </div>
@@ -256,45 +353,56 @@
                 <li>
                     <strong>Arrhythmia Detection Project</strong>
                     A deep learning model trained on ECG signals for early arrhythmia detection.
-                    <a href="arrythmia_detection.html">View Details <i class="fas fa-arrow-right"></i></a>
+
+                    <button class="terminal-btn" onclick="window.parent.postMessage({
+                        type: 'CREATE_TERMINAL',
+                        path: 'arrythmia_detection.html',
+                        project: 'Arrhythmia Detection'
+                    }, '*')">
+                        <i class="fas fa-terminal"></i>View Details
+                    </button>
                 </li>
             </ul>
         </div>
     </div>
 
     <script>
-        // Matrix rain effect
+        // Matrix background animation
         const canvas = document.getElementById('matrix');
         const ctx = canvas.getContext('2d');
-
         canvas.width = window.innerWidth;
         canvas.height = window.innerHeight;
-
-        const characters = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789@#$%^&*()';
+        const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789@#$%^&*()';
         const fontSize = 10;
         const columns = canvas.width / fontSize;
-
         const drops = new Array(Math.floor(columns)).fill(1);
 
         function draw() {
             ctx.fillStyle = 'rgba(0, 0, 0, 0.05)';
             ctx.fillRect(0, 0, canvas.width, canvas.height);
-
             ctx.fillStyle = '#0F0';
             ctx.font = fontSize + 'px monospace';
 
             for (let i = 0; i < drops.length; i++) {
-                const text = characters.charAt(Math.floor(Math.random() * characters.length));
+                const text = chars[Math.floor(Math.random() * chars.length)];
                 ctx.fillText(text, i * fontSize, drops[i] * fontSize);
-
-                if (drops[i] * fontSize > canvas.height && Math.random() > 0.975) {
+                if (drops[i] * fontSize > canvas.height && Math.random() > 0.975)
                     drops[i] = 0;
-                }
                 drops[i]++;
             }
         }
 
         setInterval(draw, 33);
+
+        // Update current time
+        function updateTime() {
+            const now = new Date();
+            document.getElementById('current-time').textContent =
+                now.toLocaleTimeString('en-US', { hour12: false });
+        }
+
+        updateTime();
+        setInterval(updateTime, 1000);
 
         window.addEventListener('resize', () => {
             canvas.width = window.innerWidth;

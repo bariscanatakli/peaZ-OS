@@ -25,10 +25,28 @@
             overflow-y: auto;
         }
 
+        .terminal-header {
+            border-bottom: 1px solid #00ff00;
+            padding-bottom: 1rem;
+            margin-bottom: 2rem;
+            font-size: 0.8rem;
+            opacity: 0.7;
+        }
+
+        .prompt {
+            margin-bottom: 1.5rem;
+            opacity: 0.8;
+            animation: typing 2s steps(40, end);
+            white-space: nowrap;
+            overflow: hidden;
+            border-right: 2px solid #00ff00;
+        }
+
         .prompt:before {
             content: "guest@portfolio:~$ ";
-            opacity: 0.8;
+            color: #ffcc00;
         }
+
 
         h1 {
             color: #ffcc00;
@@ -92,22 +110,7 @@
             opacity: 0.1;
         }
 
-        .terminal-header {
-            border-bottom: 1px solid #00ff00;
-            padding-bottom: 1rem;
-            margin-bottom: 2rem;
-            font-size: 0.8rem;
-            opacity: 0.7;
-        }
-
-        .prompt {
-            margin-bottom: 1.5rem;
-            opacity: 0.8;
-            animation: typing 2s steps(40, end);
-            white-space: nowrap;
-            overflow: hidden;
-            border-right: 2px solid #00ff00;
-        }
+    
 
         li {
             margin: 0.8rem 0;
@@ -176,17 +179,14 @@
             <div>Shell: PowerShell v7.3.4</div>
             <div>Time: <span id="current-time"></span></div>
         </div>
-
         <div class="prompt">cat ~/projects/RotaPoint.txt</div>
 
         <h1><i class="fas fa-map-marked-alt"></i> Rota Point</h1>
         <p><strong>Description:</strong> A decentralized mapping network built on the Solana blockchain. It aims to provide a secure and efficient way to manage and share location data.</p>
 
-        <div class="project-preview">
-            <img src="assets/rotapoint-preview.png" alt="Rota Point Interface" style="width: 100%; height: auto;">
-        </div>
+    
 
-        <h2><i class="fas fa-star"></i> Features</h2>
+        <h2><i class="fas fa-star"></i> Features</h2>   
         <ul>
             <li><i class="fas fa-globe"></i> Decentralized mapping</li>
             <li><i class="fas fa-shield-alt"></i> Secure data management</li>
@@ -216,8 +216,8 @@
     </div>
 
     <script>
-        // Matrix background animation
-        const canvas = document.getElementById('matrix');
+     // Matrix background animation
+     const canvas = document.getElementById('matrix');
         const ctx = canvas.getContext('2d');
         canvas.width = window.innerWidth;
         canvas.height = window.innerHeight;
@@ -253,10 +253,14 @@
         updateTime();
         setInterval(updateTime, 1000);
 
-        // Handle window resize
         window.addEventListener('resize', () => {
             canvas.width = window.innerWidth;
             canvas.height = window.innerHeight;
+
+            // Recalculate columns and reset drops array
+            const columns = Math.floor(canvas.width / fontSize);
+            drops.length = columns; // Resize the array
+            drops.fill(1); // Reset drop positions
         });
     </script>
 </body>

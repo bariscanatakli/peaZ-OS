@@ -279,3 +279,31 @@ h2 {
     margin: 0;
     line-height: 1.6;
 }
+.tips-list ol,
+.tips-list ul {
+    margin-left: 1.5rem;
+    margin-top: 0.5rem;
+}
+
+.tips-list ol li,
+.tips-list ul li {
+    margin: 0.25rem 0;
+}
+
+.tips-list .command-item {
+    margin: 0.5rem 0;
+    padding: 0.5rem;
+    background: rgba(0, 0, 0, 0.3);
+    border-radius: 4px;
+}
+
+.tips-list .command-item code {
+    color: #00ff00;
+}
+
+.tips-list .command-item span {
+    display: block;
+    font-size: 0.9em;
+    color: #aaa;
+    margin-top: 0.25rem;
+}

@@ -36,6 +36,10 @@ const HelpGuide = ({ onClose }) => {
         whoami: {
             desc: 'Display current user',
             usage: 'whoami'
+        },
+        show: {
+            desc: 'Display file contents',
+            usage: 'show [filename]'
         }
     };
 
@@ -179,7 +183,56 @@ const HelpGuide = ({ onClose }) => {
                         </li>
                     </ul>
                 </section>
+                <section className="guide-section">
+                    <h2>📁 Viewing Projects</h2>
+                    <ul className="tips-list">
+                        <li>
+                            <strong>Using the edit command:</strong>
+                            <span>The edit command opens files in the current terminal for viewing or editing (if you have permissions. You can still use it with dummy admin at public folder.)</span>
+                            <div className="command-item">
+                                <code><span>//If it is not exist.</span>guest@peaZ-OS:/public$ touch project1.html</code>
+                                <span>//This will open an editor that edits project1.html.</span>
+                                <code>guest@peaZ-OS:/public$ edit project1.html</code>
+                            </div>
+                        </li>
+                        <li>
+                            <strong>Using the show command:</strong>
+                            <span>The show command opens project files in a new terminal window, allowing you to view multiple projects simultaneously.</span>
+                            <div className="command-item">
+                                <span>//This will open project1.html in a new terminal window</span>
+                                <code>guest@peaZ-OS:/public$ show project1.html</code>
+                            </div>
+                        </li>
+                        <li>
+                            <strong>Example workflow:</strong>
+                            <ol>
+                                <li>1. First navigate to the projects directory: <code>cd /public</code></li>
+                                <li>2. List available projects: <code>ls</code></li>
+                                <li>3. View a project: <code>show project1.html</code> or <code>edit project1.html</code></li>
+                            </ol>
+                        </li>
+                        <li>
+                            <strong>Key differences:</strong>
+                            <ul>
+                                <li>- show: Opens in new window, better for viewing multiple projects. And see the projects, explore etc.</li>
+                                <li>- edit: Opens the file with a custom editor.</li>
+                                <li>- Both commands support all file types in the projects directory. But show commands will behave to render html files.</li>
+                            </ul>
+                        </li>
+                    </ul>
 
+                    <div className="terminal-box">
+                        <div className="terminal-header">
+                            <div className="terminal-controls">
+                                <div className="control-dot red"></div>
+                                <div className="control-dot yellow"></div>
+                                <div className="control-dot green"></div>
+                            </div>
+                        </div>
+                        <p><strong>Pro tip:</strong> Use <code>show</code> for exploring the projects and know about me,
+                            and use <code>edit</code> If you want to give me an expression at the public folder with dummyadmin account.</p>
+                    </div>
+                </section>
 
                 <section className="guide-section">
                     <h2>🔐 How to Login</h2>

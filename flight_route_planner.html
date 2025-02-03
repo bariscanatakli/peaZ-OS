@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -50,7 +51,8 @@
             color: #ffcc00;
         }
 
-        h1, h2 {
+        h1,
+        h2 {
             color: #ffcc00;
             text-shadow: 0 0 10px rgba(255, 204, 0, 0.3);
             margin: 1.5rem 0;
@@ -114,24 +116,110 @@
         }
 
         @keyframes typing {
-            from { width: 0 }
-            to { width: 100% }
+            from {
+                width: 0
+            }
+
+            to {
+                width: 100%
+            }
+        }
+
+        .terminal-header {
+            border-bottom: 1px solid #00ff00;
+            padding-bottom: 1rem;
+            margin-bottom: 2rem;
+            font-size: 0.8rem;
+            opacity: 0.7;
+        }
+
+        .prompt {
+            margin-bottom: 1.5rem;
+            opacity: 0.8;
+            animation: typing 2s steps(40, end);
+            white-space: nowrap;
+            overflow: hidden;
+            border-right: 2px solid #00ff00;
+        }
+
+        .prompt:before {
+            content: "guest@portfolio:~$ ";
+            color: #ffcc00;
+        }
+
+
+        /* Root Variables */
+        :root {
+            --scrollbar-bg: rgba(30, 30, 30, 0.95);
+            --scrollbar-thumb: #00ff00;
+            --scrollbar-hover: #33ff33;
+        }
+
+        /* Body Scrollbar - Firefox */
+        html {
+            scrollbar-width: thin;
+            scrollbar-color: var(--scrollbar-thumb) var(--scrollbar-bg);
+        }
+
+        /* Body Scrollbar - Webkit */
+        ::-webkit-scrollbar {
+            width: 8px;
+        }
+
+        ::-webkit-scrollbar-track {
+            background: var(--scrollbar-bg);
+        }
+
+        ::-webkit-scrollbar-thumb {
+            background-color: var(--scrollbar-thumb);
+            border-radius: 4px;
+            border: 2px solid var(--scrollbar-bg);
+        }
+
+        ::-webkit-scrollbar-thumb:hover {
+            background-color: var(--scrollbar-hover);
+        }
+
+        /* Remove Terminal Scrollbar */
+        .terminal {
+            -ms-overflow-style: none;
+            scrollbar-width: none;
+        }
+
+        .terminal::-webkit-scrollbar {
+            display: none;
+        }
+
+        @media (max-width: 768px) {
+            body {
+                padding: 0.5rem;
+            }
+
+            .terminal {
+                padding: 1rem;
+                margin: 0.5rem;
+            }
         }
 
         /* Existing scrollbar styles remain the same */
     </style>
 </head>
+
 <body>
     <canvas class="matrix-bg" id="matrix"></canvas>
     <div class="terminal">
+        <div class="terminal-header">
+            <div>System: Windows_NT x64 10.0.19044</div>
+            <div>Shell: PowerShell v7.3.4</div>
+            <div>Time: <span id="current-time"></span></div>
+        </div>
         <div class="prompt">cat ~/projects/FlightRoutePlanner.txt</div>
 
         <h1>Flight Route Planner</h1>
-        <p><strong>Description:</strong> Flight Route Planner is a web-based application that helps users find optimal flight routes between airports. Built with React and powered by advanced pathfinding algorithms, it provides an interactive map interface for visualizing and planning flight paths.</p>
+        <p><strong>Description:</strong> Flight Route Planner is a web-based application that helps users find optimal
+            flight routes between airports. Built with React and powered by advanced pathfinding algorithms, it provides
+            an interactive map interface for visualizing and planning flight paths.</p>
 
-        <div class="project-preview">
-            <img src="assets/flight-route-planner-preview.png" alt="Flight Route Planner Interface">
-        </div>
 
         <h2><i class="fas fa-star"></i> Features</h2>
         <ul>
@@ -151,10 +239,8 @@
 
         <h2><i class="fab fa-github"></i> GitHub Repository</h2>
         <p>
-            <a href="https://github.com/bariscanatakli/flight-route-planner" 
-               target="_blank" 
-               rel="noopener noreferrer"
-               class="github-link">
+            <a href="https://github.com/bariscanatakli/flight-route-planner" target="_blank" rel="noopener noreferrer"
+                class="github-link">
                 <i class="fab fa-github"></i>
                 View Source Code
                 <i class="fas fa-external-link-alt"></i>
@@ -163,13 +249,14 @@
     </div>
 
     <script>
+        // Matrix background animation
         const canvas = document.getElementById('matrix');
         const ctx = canvas.getContext('2d');
         canvas.width = window.innerWidth;
         canvas.height = window.innerHeight;
         const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789@#$%^&*()';
         const fontSize = 10;
-        const columns = canvas.width/fontSize;
+        const columns = canvas.width / fontSize;
         const drops = new Array(Math.floor(columns)).fill(1);
 
         function draw() {
@@ -177,11 +264,11 @@
             ctx.fillRect(0, 0, canvas.width, canvas.height);
             ctx.fillStyle = '#0F0';
             ctx.font = fontSize + 'px monospace';
-            
-            for(let i = 0; i < drops.length; i++) {
+
+            for (let i = 0; i < drops.length; i++) {
                 const text = chars[Math.floor(Math.random() * chars.length)];
                 ctx.fillText(text, i * fontSize, drops[i] * fontSize);
-                if(drops[i] * fontSize > canvas.height && Math.random() > 0.975)
+                if (drops[i] * fontSize > canvas.height && Math.random() > 0.975)
                     drops[i] = 0;
                 drops[i]++;
             }
@@ -189,10 +276,26 @@
 
         setInterval(draw, 33);
 
+        // Update current time
+        function updateTime() {
+            const now = new Date();
+            document.getElementById('current-time').textContent =
+                now.toLocaleTimeString('en-US', { hour12: false });
+        }
+
+        updateTime();
+        setInterval(updateTime, 1000);
+
         window.addEventListener('resize', () => {
             canvas.width = window.innerWidth;
             canvas.height = window.innerHeight;
+
+            // Recalculate columns and reset drops array
+            const columns = Math.floor(canvas.width / fontSize);
+            drops.length = columns; // Resize the array
+            drops.fill(1); // Reset drop positions
         });
     </script>
 </body>
+
 </html>
