@@ -18,7 +18,7 @@ import {
 
 export const handleInput = (e, dispatch, state) => {
     if (!state) return;
- 
+
     const {
         input = '',
         history = [],
@@ -129,7 +129,7 @@ export const handleCommand = async (cmd, dispatch, state) => {
     // Add command echo
     dispatch(addOutput({
         terminalId: state.id,
-        output: `${getPrompt(state.path, state.role)}${cmd}`
+        output: `${getPrompt(state.path, state.role, state.username)}${cmd}`
     }));
 
     // Debug: log terminalId
@@ -138,7 +138,7 @@ export const handleCommand = async (cmd, dispatch, state) => {
     // Check if command exists
     if (!commands[command]) {
         dispatch(addOutput({
-            terminalId: state.id, 
+            terminalId: state.id,
             output: `command not found: ${command}`
         }));
         return;

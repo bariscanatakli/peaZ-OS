@@ -15,12 +15,23 @@ import {
     setAwaitingPassword,
     setPath,
     setSuggestions,
+
+    setUsername,
     setHistoryIndex,
     setInput,
     updateHistory,
     clearOutput,
 } from '../../../store/slices';
 const systemDirs = ['.', '..', '.git', 'node_modules'];
+
+
+const hasPermission = (fileSystem, path, role) => {
+    if (role === 'admin') return true;
+
+    // Check if path is in public directory
+    const normalizedPath = path.startsWith('/') ? path : `/${path}`;
+    return normalizedPath.startsWith('/public');
+};
 
 export const commands = {
     // File System Commands
@@ -143,14 +154,20 @@ export const commands = {
             return `rm: cannot remove '${fileName}': No such file or directory`;
         }
 
-        if (updatedParentDir.content[fileName].type === 'dir' && !recursive) {
-            return `rm: cannot remove '${fileName}': Is a directory`;
+        const isDirectory = updatedParentDir.content[fileName].type === 'dir';
+
+        // Check if directory is empty or recursive flag is set
+        if (isDirectory) {
+            const isEmpty = Object.keys(updatedParentDir.content[fileName].content).length === 0;
+            if (!recursive && !isEmpty) {
+                return `rm: cannot remove '${fileName}': Directory not empty (use -r flag)`;
+            }
         }
 
         // Delete file/directory
         delete updatedParentDir.content[fileName];
 
-        // Update Redux state using setFileSystem action
+        // Update Redux state
         dispatch(setFileSystem({ fileSystem: updatedFileSystem }));
 
         // Save to Firebase
@@ -244,37 +261,39 @@ export const commands = {
             return 'Usage: login <username> <password>';
         }
 
-        const [username, password] = args;
+        const [email, password] = args;
 
         try {
             // Attempt Firebase authentication
-            const userCredential = await signInWithEmailAndPassword(auth, username, password);
+            const userCredential = await signInWithEmailAndPassword(auth, email, password);
             const tokenResult = await userCredential.user.getIdTokenResult();
 
-            // Set role based on token claims
+            // Extract username from email
+            const username = email.split('@')[0];
+
             const userRole = tokenResult.claims.role || 'guest';
-            dispatch(setRole({ terminalId: state.id, role: userRole }));
+
+            if (username === "dummyadmin") {
+                dispatch(setRole({ terminalId: state.id, role: 'dummyadmin' }));
+            } else {
+                // Set role and username
+
+                dispatch(setRole({ terminalId: state.id, role: userRole }));
+                dispatch(setUsername({ terminalId: state.id, username: username }));
+            }
+
+
 
             // Add welcome message
             dispatch(addOutput({
                 terminalId: state.id,
-                output: `Welcome ${username}. Logged in as ${userRole}.`
+                output: `Welcome ${username}. Logged in as ${username === "dummyadmin" ? "dumymadmin" : userRole}.`
             }));
 
             return null;
         } catch (error) {
-            console.error('Login error:', error.code, error.message);
-
-            switch (error.code) {
-                case 'auth/user-not-found':
-                    return 'Login failed: Invalid username';
-                case 'auth/wrong-password':
-                    return 'Login failed: Invalid password';
-                case 'auth/invalid-email':
-                    return 'Login failed: Invalid email format';
-                default:
-                    return `Login failed: ${error.message}`;
-            }
+            console.error('Login error:', error);
+            return `Login failed: ${error.message}`;
         }
     },
     sudo: (args, fileSystem, path, dispatch, role, state) => {
@@ -341,15 +360,18 @@ export const commands = {
             return false;
         }
     },
+
     logout: (args, fileSystem, path, dispatch, role, state) => {
         if (role !== 'admin') return 'logout: not logged in as admin';
         dispatch(setRole({ terminalId: state.id, role: 'guest' }));
-        return 'Switched to guest user.';
+        dispatch(setUsername({ terminalId: state.id, username: null }));
+        return 'Logged out. Switched to guest user.';
     },
 
-    whoami: (args, fileSystem, path, dispatch, role) => {
-        return `${role}@peaZ-OS`;
+    whoami: (args, fileSystem, path, dispatch, role, state) => {
+        return `Username:${state.username || 'guest'}, Role:${role}`;
     },
+
 
     // Add permissions system 
     chmod: async (args, fileSystem, path, dispatch, role) => {

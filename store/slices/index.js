@@ -49,7 +49,7 @@ const terminalState = {
   dimensions: calculateTerminalDimensions(),
   isResizing: false,
   resizeDirection: "",
-
+  username: null,
 
 };
 
@@ -76,7 +76,7 @@ export const terminalsSlice = createSlice({
         y: Math.min(window.innerHeight / 3 + state.positionOffset)
       };
 
-      const newTerminal = { 
+      const newTerminal = {
         ...terminalState,
         id,
         key,
@@ -328,6 +328,13 @@ export const terminalsSlice = createSlice({
         terminal.resizeDirection = direction
       }
     },
+    setUsername: (state, action) => {
+      const { terminalId, username } = action.payload;
+      const terminal = state.terminals.find(t => t.id === terminalId);
+      if (terminal) {
+        terminal.username = username;
+      }
+    },
   },
 });
 
@@ -350,7 +357,7 @@ export const {
   setEditingFile,
   setFileContent,
   setIsEditing,
-  setActiveTerminalId,
+  setActiveTerminalId, setUsername,
   setTerminalRef,
   setInputRef,
   setDragging,
