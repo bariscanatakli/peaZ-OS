@@ -40,7 +40,7 @@ My journey in software development has been fueled by curiosity and a commitment
 
 # Terminal Portfolio
 
-An interactive terminal-style portfolio website built with React and Firebase.
+An interactive terminal-style portfolio website built with React and Firebase. You can reach it in here:https://bariscanatakli.github.io/peaZ-OS/
 
 ## 🚀 Technologies
 
