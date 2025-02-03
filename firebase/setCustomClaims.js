@@ -5,7 +5,7 @@ const setUserRole = async (uid, role) => {
   try {
     const auth = await authPromise; // Await the auth instance
     await auth.setCustomUserClaims(uid, { role });
-    console.log(`Success! UID: ${uid} has been set to role: ${role}`);
+ 
   } catch (error) {
     console.error('Error setting custom claims:', error);
   }

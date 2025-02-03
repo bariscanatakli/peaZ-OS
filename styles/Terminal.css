@@ -126,7 +126,8 @@
 }
 
 .terminal::-webkit-scrollbar-thumb:hover {
-    background-color: #33ff33;
+    display: block !important;
+    width: 8px;
 }
 
 /* Scrollbar styles */

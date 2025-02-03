@@ -22,16 +22,45 @@ import {
     updateHistory,
     clearOutput,
 } from '../../../store/slices';
+
+
 const systemDirs = ['.', '..', '.git', 'node_modules'];
 
-
 const hasPermission = (fileSystem, path, role) => {
+    // Full admin can do anything
     if (role === 'admin') return true;
 
-    // Check if path is in public directory
-    const normalizedPath = path.startsWith('/') ? path : `/${path}`;
-    return normalizedPath.startsWith('/public');
+    // dummyadmin can only work in /public
+    if (role === 'dummyadmin') {
+        const normalizedPath = path.startsWith('/') ? path : `/${path}`;
+        return normalizedPath.includes('/public/') || normalizedPath === '/public';
+    }
+
+    // Regular users can only read
+    return true; // For read operations only
 };
+
+const isWriteOperation = (command) => {
+    return ['touch', 'mkdir', 'rm', 'edit'].includes(command);
+};
+
+// Wrap command execution with permission check
+const checkPermissionAndExecute = (command, args, fileSystem, path, role) => {
+    if (isWriteOperation(command) && role !== 'admin') {
+        // For write operations, check if dummyadmin has permission
+        if (role === 'dummyadmin') {
+            const targetPath = args[0] ? resolvePath(path, args[0]) : path;
+            if (!hasPermission(fileSystem, targetPath, role)) {
+                return `${command}: Permission denied - dummyadmin can only modify /public directory`;
+            }
+        } else {
+            return `${command}: Permission denied`;
+        }
+    }
+    return null; // Permission granted
+};
+
+
 
 export const commands = {
     // File System Commands
@@ -64,7 +93,7 @@ export const commands = {
 
         if (dir && dir.type === 'dir') {
             // Debug: log terminalId and resolvedPath
-            console.log('Dispatching setPath with terminalId:', state.id, 'resolvedPath:', resolvedPath);
+         
             dispatch(setPath({ terminalId: state.id, path: resolvedPath }));
             return `Changed directory to ${resolvedPath}`;
         }
@@ -72,7 +101,8 @@ export const commands = {
     },
 
     mkdir: async (args, fileSystem, path, dispatch, role, state) => {
-        if (role !== 'admin') return 'mkdir: permission denied';
+        const permissionError = checkPermissionAndExecute('mkdir', args, fileSystem, path, role);
+        if (permissionError) return permissionError;
         if (args.length === 0) return 'mkdir: missing operand';
 
         const dirName = args[0];
@@ -94,12 +124,9 @@ export const commands = {
         return `Directory '${dirName}' created successfully`;
     },
 
-    touch: async (args, fileSystem, path, dispatch, role, actions) => {
-        console.log("Debug touch - role:", role); // Debug log
-
-        if (role !== 'admin') {
-            return 'touch: permission denied';
-        }
+    touch: async (args, fileSystem, path, dispatch, role, state) => {
+        const permissionError = checkPermissionAndExecute('touch', args, fileSystem, path, role);
+        if (permissionError) return permissionError;
 
         if (args.length === 0) {
             return 'touch: missing file operand';
@@ -130,10 +157,8 @@ export const commands = {
     },
 
     rm: async (args, fileSystem, path, dispatch, role) => {
-        if (role !== 'admin') {
-            return 'rm: permission denied';
-        }
-
+        const permissionError = checkPermissionAndExecute('rm', args, fileSystem, path, role);
+        if (permissionError) return permissionError;
         if (args.length === 0) {
             return 'rm: missing operand';
         }
@@ -194,9 +219,8 @@ export const commands = {
             return 'edit: terminal state not initialized';
         }
 
-        if (role !== 'admin') {
-            return 'edit: permission denied';
-        }
+        const permissionError = checkPermissionAndExecute('edit', args, fileSystem, path, role);
+        if (permissionError) return permissionError;
 
         if (args.length === 0) {
             return 'edit: missing file operand';
@@ -297,6 +321,8 @@ export const commands = {
         }
     },
     sudo: (args, fileSystem, path, dispatch, role, state) => {
+        return "Not implemented yet."
+
         if (!state || !state.id) {
             return 'sudo: terminal state not initialized';
         }
@@ -337,6 +363,7 @@ export const commands = {
     },
 
     'su': (args, fileSystem, path, dispatch, role) => {
+        return "Not implemented yet."
         if (role === 'admin') {
             return 'su: user root is already logged in';
         }
@@ -351,6 +378,7 @@ export const commands = {
         return 'Password: ';
     },
     verifyPassword: async (password) => {
+        return "Not implemented yet."
         try {
             // Use stored admin credentials
             const adminEmail = process.env.NEXT_PUBLIC_ADMIN_EMAIL;
@@ -362,7 +390,9 @@ export const commands = {
     },
 
     logout: (args, fileSystem, path, dispatch, role, state) => {
-        if (role !== 'admin') return 'logout: not logged in as admin';
+        if (role === 'guest') {
+            return 'logout: No active user';
+        }
         dispatch(setRole({ terminalId: state.id, role: 'guest' }));
         dispatch(setUsername({ terminalId: state.id, username: null }));
         return 'Logged out. Switched to guest user.';
@@ -375,6 +405,7 @@ export const commands = {
 
     // Add permissions system 
     chmod: async (args, fileSystem, path, dispatch, role) => {
+        return "Not implemented yet."
         if (role !== 'admin') return 'chmod: Permission denied';
         // Add chmod implementation
         return 'Permission changes not implemented yet';
@@ -451,7 +482,9 @@ clear - clear terminal screen
 pwd - print working directory
 echo - display a line of text
 history - show command history
-help - display this help message`;
+help - display this help message
+`
+;
     },
 
     exit: (args, fileSystem, path, dispatch, role) => {

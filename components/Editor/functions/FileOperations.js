@@ -1,5 +1,5 @@
 const handleSave = async (newContent) => {
-    console.log('Saving file:', editingFile);
+
     if (!fileSystem || !fileSystem['~'].content) {
         setOutput(prev => [...prev, 'Error: File system is not initialized.']);
         return;

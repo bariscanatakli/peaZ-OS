@@ -132,8 +132,7 @@ export const handleCommand = async (cmd, dispatch, state) => {
         output: `${getPrompt(state.path, state.role, state.username)}${cmd}`
     }));
 
-    // Debug: log terminalId
-    console.log('Terminal ID:', state.id);
+  
 
     // Check if command exists
     if (!commands[command]) {
@@ -171,6 +170,6 @@ export const handleCommand = async (cmd, dispatch, state) => {
 };
 
 export const getPrompt = (path = '/', role = 'guest') => {
-    const username = role === 'admin' ? 'root' : 'guest';
+    const username = role;
     return `${username}@peaZ-OS:${path}${path === '/' ? '' : '/'} `;
 };

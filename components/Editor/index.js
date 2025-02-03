@@ -28,8 +28,7 @@ const Editor = ({ id }) => {
         }
 
         try {
-            console.log('Starting save operation:', editingFile);
-
+          
             if (!fileSystem || !fileSystem['~']) {
                 throw new Error('File system not initialized');
             }
@@ -42,11 +41,7 @@ const Editor = ({ id }) => {
             const fileName = pathParts.pop();
             const dirPath = pathParts.join('/') || '/';
 
-            console.log('Debug:', {
-                normalizedPath,
-                dirPath,
-                fileName
-            });
+         
 
             // Get parent directory with improved error handling
             const parentDir = getDirectory(updatedFileSystem, dirPath);

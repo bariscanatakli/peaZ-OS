@@ -1,18 +1,18 @@
-import React, { useRef, useEffect } from 'react'
+import React, { useRef, useLayoutEffect } from 'react'
 import { getPrompt } from '../../functions'
 
 function Output({ output, path, role }) {
     const outputRef = useRef(null);
 
     const scrollToBottom = () => {
-        if (outputRef.current) {
-            outputRef.current.scrollTop = outputRef.current.scrollHeight;
+        if (outputRef.current && outputRef.current.lastElementChild) {
+            outputRef.current.lastElementChild.scrollIntoView({ behavior: 'smooth' });
         }
     };
 
-    useEffect(() => {
+    useLayoutEffect(() => {
         scrollToBottom();
-    }, [output]); // Scroll when output changes
+    }, [output]);
 
     return (
         <div className="terminal-output" ref={outputRef}>
@@ -20,7 +20,9 @@ function Output({ output, path, role }) {
                 typeof line === 'string' && line.startsWith(getPrompt(path, role) + ' $') ? (
                     <div key={i} className="output-line">
                         <span className="prompt">{getPrompt(path, role)} $ </span>
-                        <span className="command">{line.slice((getPrompt(path, role) + ' $ ').length)}</span>
+                        <span className="command">
+                            {line.slice((getPrompt(path, role) + ' $ ').length)}
+                        </span>
                     </div>
                 ) : (
                     <div key={i} className="output-line">

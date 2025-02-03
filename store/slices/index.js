@@ -127,7 +127,7 @@ export const terminalsSlice = createSlice({
 
     setActiveTerminalId: (state, action) => {
       state.activeTerminalId = action.payload;
-      console.log('Setting active terminal:', action.payload); // Debug
+   
     },
     minimizeTerminal: (state, action) => {
       const terminal = state.terminals.find(t => t.id === action.payload);
@@ -271,7 +271,7 @@ export const terminalsSlice = createSlice({
     },
     setDragging: (state, action) => {
       const { terminalId, isDragging } = action.payload;
-      console.log(isDragging)
+   
       const terminal = state.terminals.find(t => t.id === terminalId);
       if (terminal) {
         terminal.isDragging = isDragging;

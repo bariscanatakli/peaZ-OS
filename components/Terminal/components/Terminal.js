@@ -11,21 +11,19 @@ function TerminalComponent({ id }) {
 
   useEffect(() => {
     const handleMessage = async (event) => {
-      console.log(event);
+
       if (event.data.type === 'CREATE_TERMINAL') {
         try {
 
           const fs = await fetchFileSystem();
-          // console.log(fs?.["~"]?.["content"]?.["projects"]?.["content"]["netscope.html"]?.["content"]);
-
-          console.log(event);
+        
 
 
           const html = fs?.["~"]?.["content"]?.["projects"]?.["content"][event.data.path]?.["content"]
 
           const response = await fetch(`${event.path}`);
 
-          // console.log(response);
+         
 
           // const html = await response.text();
 

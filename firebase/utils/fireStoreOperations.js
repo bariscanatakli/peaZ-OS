@@ -40,7 +40,7 @@ export const saveFileSystem = async (fileSystem) => {
         // Save to Firestore
         await setDoc(doc(db, "fileSystems", "default"), fileSystemToSave);
         
-        console.log('File system saved successfully');
+      
         return fileSystemToSave;
     } catch (error) {
         console.error('Error saving to Firestore:', error);
