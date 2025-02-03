@@ -1,25 +1,10 @@
 /** @type {import('next').NextConfig} */
 const nextConfig = {
-  // output: 'export',
-  basePath: '',
-  assetPrefix: '/',
+  output: 'export',
   images: {
-    unoptimized: true
+    unoptimized: true,
   },
-  trailingSlash: true, // Tüm sayfa URL’lerinin sonunda / ekler
-  reactStrictMode: true,
-  // images: {
-  //   domains: ['your-domain.com'],
-  // },
-  async redirects() {
-    return [
-      {
-        source: '/projects',
-        destination: '/',
-        permanent: true,
-      },
-    ];
-  }
-};
+  basePath: '/peaZ-OS',
+}
 
 export default nextConfig;

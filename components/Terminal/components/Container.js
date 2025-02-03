@@ -7,7 +7,9 @@ function Container({ children, id }) {
   const dispatch = useDispatch();
   const terminalRef = useRef(null);
   const prevDimensionsRef = useRef(null);
-
+  const inputRef = useSelector(state =>
+    state.terminals.terminals.find(t => t.id === id)?.refs?.input
+  );
   const terminalState = useSelector(state =>
     state.terminals.terminals.find(t => t.id === id)
   );
@@ -33,7 +35,7 @@ function Container({ children, id }) {
     if (!terminalRef.current) return;
 
     const resizeObserver = new ResizeObserver(entries => {
-      const entry = entries[0]; 
+      const entry = entries[0];
       if (entry) {
         const { width, height } = entry.contentRect;
         updateDimensions(width, height);
@@ -41,38 +43,39 @@ function Container({ children, id }) {
     });
 
     resizeObserver.observe(terminalRef.current);
-    
+
     return () => {
       resizeObserver.disconnect();
       updateDimensions.cancel();
     };
   }, [updateDimensions]);
 
-  const handleFocus = () => {
+  const handleContainerClick = () => {
     dispatch(bringToFront(id));
     dispatch(setActiveTerminalId(id));
+    if (inputRef) {
+      inputRef.focus();
+    }
   };
 
   return (
     <div
-    ref={terminalRef}
-    tabIndex={-1}
-    className={`terminal-container ${isMinimized ? 'minimized' : ''} 
+      ref={terminalRef}
+      tabIndex={-1}
+      className={`terminal-container ${isMinimized ? 'minimized' : ''} 
                ${isMaximized ? 'maximized' : ''} 
                ${activeTerminalId === id ? 'active' : ''}`}
-    style={{
-      top: `${position.y}px`,
-      left: `${position.x}px`,
-      zIndex,
-      width: `${dimensions.width}px`,
-      height: `${dimensions.height}px`,
-      outline: 'none'
-    }}
-    onFocus={handleFocus}
-    onClick={handleFocus}
-  >
-    {children}
-  </div>
+      style={{
+        top: `${position.y}px`,
+        left: `${position.x}px`,
+        zIndex,
+        width: `${dimensions.width}px`,
+        height: `${dimensions.height}px`,
+      }}
+      onClick={handleContainerClick}
+    > 
+      {children}
+    </div>
   );
 }
 

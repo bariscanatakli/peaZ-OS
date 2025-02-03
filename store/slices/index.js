@@ -13,8 +13,8 @@ const calculateTerminalDimensions = () => {
     return { width: 800, height: 600 };
   }
 
-  const width = Math.max(window.innerWidth * 0.6, 600);
-  const height = Math.max(window.innerHeight * 0.7, 400);
+  const width = Math.max(window.innerWidth * 0.5, 600);
+  const height = Math.max(window.innerHeight * 0.6, 400);
   return { width, height };
 };
 
@@ -72,11 +72,11 @@ export const terminalsSlice = createSlice({
       const newPosition = {
 
 
-        x: Math.min(window.innerWidth / 2 + state.positionOffset),
-        y: Math.min(window.innerHeight / 2 + state.positionOffset)
+        x: Math.min(window.innerWidth / 3 + state.positionOffset),
+        y: Math.min(window.innerHeight / 3 + state.positionOffset)
       };
 
-      const newTerminal = {
+      const newTerminal = { 
         ...terminalState,
         id,
         key,
@@ -99,7 +99,7 @@ export const terminalsSlice = createSlice({
       };
       state.terminals.push(newTerminal);
       state.currentZIndex++;
-      state.positionOffset = (state.positionOffset + 25) % 200;
+      state.positionOffset = (state.positionOffset + 20) % 300;
     },
 
     removeTerminal: (state, action) => {
